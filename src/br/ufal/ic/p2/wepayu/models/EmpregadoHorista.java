@@ -1,12 +1,11 @@
 package br.ufal.ic.p2.wepayu.models;
-import br.ufal.ic.p2.wepayu.Exception.DataInvalidaException;
+import br.ufal.ic.p2.wepayu.Utils;
+
 import java.time.LocalDate;
-import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 
 public class EmpregadoHorista extends Empregado{
 
@@ -18,7 +17,7 @@ public class EmpregadoHorista extends Empregado{
         super();
     }
     public EmpregadoHorista(String nome, String endereco, String tipo, Double salarioPorHora) throws Exception {
-        super(nome, endereco, tipo, null);
+        super(nome, endereco, tipo);
         setSalarioPorHora(salarioPorHora);
         this.cartoes = new ArrayList<>();
     }
@@ -43,35 +42,6 @@ public class EmpregadoHorista extends Empregado{
         cartoes.add(cartao);
     }
 
-    private String validaData(String data) throws Exception{
-        Pattern pattern = Pattern.compile("([0-3]?[0-9])/(0?[1-9]|1[0-2])/(\\d{4})");
-
-        Matcher matcher = pattern.matcher(data);
-
-        if(!matcher.matches())
-        {
-            throw new DataInvalidaException();
-        }
-        else{
-            int dia = Integer.parseInt(matcher.group(1));
-            int mes = Integer.parseInt(matcher.group(2));
-            int year = Integer.parseInt(matcher.group(3));
-
-            if (mes == 2)
-            {
-                if((Year.isLeap(year) && dia > 29) || dia > 28) throw new DataInvalidaException();
-            }
-            else if(mes == 5 || mes == 6 || mes == 9 || mes == 11) {
-                if (dia > 30) throw new DataInvalidaException();
-            }
-            else{
-                if(dia > 31) throw new DataInvalidaException();
-            }
-
-        }
-
-        return data;
-    }
 
     public Double getHorasNormaisTrabalhadas(String dataInicial, String dataFinal) throws Exception{
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy");
@@ -79,10 +49,10 @@ public class EmpregadoHorista extends Empregado{
         LocalDate dInicial = null;
         LocalDate dFinal = null;
 
-        try {dInicial = LocalDate.parse(validaData(dataInicial), formatter);}
+        try {dInicial = LocalDate.parse(Utils.validarData(dataInicial), formatter);}
         catch (Exception e) {throw new Exception("Data inicial invalida.");}
 
-        try{dFinal = LocalDate.parse(validaData(dataFinal), formatter);}
+        try{dFinal = LocalDate.parse(Utils.validarData(dataFinal), formatter);}
         catch (Exception e) {throw new Exception("Data final invalida.");}
 
         if(dInicial.isAfter(dFinal)) throw new Exception("Data inicial nao pode ser posterior aa data final.");

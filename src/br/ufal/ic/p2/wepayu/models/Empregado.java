@@ -10,15 +10,16 @@ public class Empregado implements Serializable{
     private String endereco;
     private String tipo;
 
-    private Optional<MembroSindicato> membroSindicato;
+    private MembroSindicato membroSindicato;
+    private MetodoPagamento metodoPagamento;
 
     public Empregado(){}
-    public Empregado(String nome, String endereco, String tipo, MembroSindicato membroSindicato) throws Exception {
+    public Empregado(String nome, String endereco, String tipo) throws Exception {
         setId(UUID.randomUUID().toString());
         setNome(nome);
         setEndereco(endereco);
         setTipo(tipo);
-        setSindicalizado(membroSindicato);
+        setMetodoPagamento(new MetodoPagamento("emMaos"));
     }
 
     public String getId() { return id; }
@@ -57,12 +58,23 @@ public class Empregado implements Serializable{
         this.tipo = tipo;
     }
 
-
     public boolean getSindicalizado(){
-        return (membroSindicato == null);
+        return (membroSindicato != null);
     }
 
-    public void setSindicalizado(MembroSindicato membroSindicato) {
-        this.membroSindicato = Optional.ofNullable(membroSindicato);
+    public MembroSindicato getMembroSindicato() {
+        return membroSindicato;
+    }
+
+    public void setMembroSindicato(MembroSindicato membroSindicato) {
+        this.membroSindicato = membroSindicato;
+    }
+
+    public MetodoPagamento getMetodoPagamento() {
+        return metodoPagamento;
+    }
+
+    public void setMetodoPagamento(MetodoPagamento metodoPagamento) {
+        this.metodoPagamento = metodoPagamento;
     }
 }

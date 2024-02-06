@@ -12,7 +12,7 @@ public class EmpregadoAssalariado extends Empregado implements Serializable {
         super();
     }
     public EmpregadoAssalariado(String nome, String endereco, String tipo, Double salarioMensal) throws Exception {
-        super(nome, endereco, tipo, null);
+        super(nome, endereco, tipo);
         setSalarioMensal(salarioMensal);
     }
 

@@ -1,6 +1,7 @@
 package br.ufal.ic.p2.wepayu;
 
 import br.ufal.ic.p2.wepayu.Exception.AtributoInexistenteException;
+import br.ufal.ic.p2.wepayu.Exception.DataInvalidaException;
 import br.ufal.ic.p2.wepayu.models.Empregado;
 import br.ufal.ic.p2.wepayu.models.EmpregadoAssalariado;
 import br.ufal.ic.p2.wepayu.models.EmpregadoComissionado;
@@ -9,57 +10,39 @@ import br.ufal.ic.p2.wepayu.models.EmpregadoHorista;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
+import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Utils {
 
-    public static Double salarioFormatter(String valor) throws Exception {
-        Double salarioConvertido;
+
+    public static Double formatarValor(String valor, String nome, String sufix) throws Exception {
+        Double valorConvertido;
         try{
-            salarioConvertido = Double.parseDouble(valor.replace(",", "."));
+            valorConvertido = Double.parseDouble(valor.replace(",", "."));
         }
         catch (NumberFormatException e){
             if (valor.isEmpty())
             {
-                throw new Exception("Salario nao pode ser nulo.");
+                throw new Exception(nome + " nao pode ser nul" + sufix + ".");
             }
             else{
-                throw new Exception("Salario deve ser numerico.");
+                throw new Exception(nome + " deve ser numeric" + sufix + ".");
             }
         }
 
-        if(salarioConvertido < 0){
-            throw new Exception("Salario deve ser nao-negativo.");
+        if(valorConvertido < 0){
+            throw new Exception(nome + " deve ser nao-negativ" + sufix + ".");
         }
 
-        return salarioConvertido;
-    }
-
-    public static Double comissaoFormatter(String valor) throws Exception {
-        Double comissaoConvertida;
-        try{
-            comissaoConvertida = Double.parseDouble(valor.replace(",", "."));
-        }
-        catch (NumberFormatException e){
-            if (valor.isEmpty())
-            {
-                throw new Exception("Comissao nao pode ser nula.");
-            }
-            else{
-                throw new Exception("Comissao deve ser numerica.");
-            }
-        }
-
-        if(comissaoConvertida < 0){
-            throw new Exception("Comissao deve ser nao-negativa.");
-        }
-
-        return comissaoConvertida;
+        return valorConvertido;
     }
 
     public static String doubleToString(Double valor, boolean lazy){
@@ -67,22 +50,68 @@ public class Utils {
         return formatter.format(valor);
     }
 
-    public static String dataValidate(String data) throws Exception{
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy");
-        //TODO: FAZER O MESMO QUE EM EMPREGADOHORISTA
-        try {LocalDate dataConvertida = LocalDate.parse(data, formatter);}
-        catch (DateTimeParseException e) {
-            throw new Exception("Data invalida.");
+    public static String validarData(String data) throws Exception{
+        Pattern pattern = Pattern.compile("([0-3]?[0-9])/(0?[1-9]|1[0-2])/(\\d{4})");
+
+        Matcher matcher = pattern.matcher(data);
+
+        if(!matcher.matches())
+        {
+            throw new DataInvalidaException();
+        }
+        else{
+            int dia = Integer.parseInt(matcher.group(1));
+            int mes = Integer.parseInt(matcher.group(2));
+            int year = Integer.parseInt(matcher.group(3));
+
+            if (mes == 2)
+            {
+                if((Year.isLeap(year) && dia > 29) || dia > 28) throw new DataInvalidaException();
+            }
+            else if(mes == 5 || mes == 6 || mes == 9 || mes == 11) {
+                if (dia > 30) throw new DataInvalidaException();
+            }
+            else{
+                if(dia > 31) throw new DataInvalidaException();
+            }
+
         }
 
         return data;
     }
 
-    public static String horasValidate(String horas) throws Exception{
+    public static String validarAtributo(String atributo, String[] valores, String nome, boolean bool) throws Exception{
+        if(atributo.isEmpty()) throw new Exception(nome + " nao pode ser nulo.");
+
+        if(!Arrays.asList(valores).contains(atributo)) {
+            if (bool) {
+                throw new Exception(nome + " deve ser true ou false.");
+            } else throw new Exception(nome + " invalido.");
+        }
+        return atributo;
+    }
+
+    public static String validarAtributo(String atributo, String nome, String sufix) throws Exception{
+        if(atributo != null)
+            if(atributo.isEmpty()) throw new Exception(nome + " nao pode ser nul" + sufix + ".");
+
+        return atributo;
+    }
+
+    public static String validarHoras(String horas) throws Exception{
         if(Double.parseDouble(horas.replace(",", ".")) <= 0){
             throw new Exception("Horas devem ser positivas.");
         }
         return horas;
+    }
+
+    public static Double validarValor(String valor) throws Exception{
+        valor = validarAtributo(valor, "Taxa sindical", "a");
+        Double valorConvertido = Double.parseDouble(valor.replace(",", "."));
+        if(valorConvertido <= 0){
+            throw new Exception("Valor deve ser positivo.");
+        }
+        return valorConvertido;
     }
 
     public static void checaTipo(String tipo) throws Exception {
@@ -94,33 +123,26 @@ public class Utils {
     }
 
 
-    public static String getAtributoEmpregadoAssalariado(EmpregadoAssalariado empregado, String atributo) throws AtributoInexistenteException {
+    public static String getAtributoEmpregadoAssalariado(EmpregadoAssalariado empregado, String atributo) throws Exception {
         return switch (atributo){
-            case "nome" -> empregado.getNome();
-            case "endereco" -> empregado.getEndereco();
-            case "tipo" -> empregado.getTipo();
             case "salario" -> Utils.doubleToString(empregado.getSalarioMensal(), false);
             case "sindicalizado" -> empregado.getSindicalizado() ? "true" : "false";
+            case "comissao" -> throw new Exception("Empregado nao eh comissionado.");
             default -> throw new AtributoInexistenteException();
         };
     }
 
-    public static String getAtributoEmpregadoHorista(EmpregadoHorista empregado, String atributo) throws AtributoInexistenteException {
+    public static String getAtributoEmpregadoHorista(EmpregadoHorista empregado, String atributo) throws Exception {
         return switch (atributo){
-            case "nome" -> empregado.getNome();
-            case "endereco" -> empregado.getEndereco();
-            case "tipo" -> empregado.getTipo();
             case "salario" -> Utils.doubleToString(empregado.getSalarioPorHora(), false);
             case "sindicalizado" -> empregado.getSindicalizado() ? "true" : "false";
+            case "comissao" -> throw new Exception("Empregado nao eh comissionado.");
             default -> throw new AtributoInexistenteException();
         };
     }
 
-    public static String getAtributoEmpregadoComissionado(EmpregadoComissionado empregado, String atributo) throws AtributoInexistenteException {
+    public static String getAtributoEmpregadoComissionado(EmpregadoComissionado empregado, String atributo) throws Exception {
         return switch (atributo){
-            case "nome" -> empregado.getNome();
-            case "endereco" -> empregado.getEndereco();
-            case "tipo" -> empregado.getTipo();
             case "salario" -> Utils.doubleToString(empregado.getSalarioMensal(), false);
             case "sindicalizado" -> empregado.getSindicalizado() ? "true" : "false";
             case "comissao" -> Utils.doubleToString(empregado.getTaxaDeComissao(), false);
