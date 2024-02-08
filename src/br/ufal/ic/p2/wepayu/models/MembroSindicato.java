@@ -1,13 +1,12 @@
 package br.ufal.ic.p2.wepayu.models;
 
-import br.ufal.ic.p2.wepayu.Utils;
+import br.ufal.ic.p2.wepayu.services.Utils;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class MembroSindicato implements Serializable {
 

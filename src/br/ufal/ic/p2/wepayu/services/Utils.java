@@ -1,22 +1,17 @@
-package br.ufal.ic.p2.wepayu;
+package br.ufal.ic.p2.wepayu.services;
 
-import br.ufal.ic.p2.wepayu.Exception.AtributoInexistenteException;
-import br.ufal.ic.p2.wepayu.Exception.DataInvalidaException;
+import br.ufal.ic.p2.wepayu.exceptions.DataInvalidaException;
 import br.ufal.ic.p2.wepayu.models.Empregado;
-import br.ufal.ic.p2.wepayu.models.EmpregadoAssalariado;
-import br.ufal.ic.p2.wepayu.models.EmpregadoComissionado;
-import br.ufal.ic.p2.wepayu.models.EmpregadoHorista;
 
 import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -80,6 +75,24 @@ public class Utils {
         return data;
     }
 
+    public static void checarAtributo(Empregado e, String atributo) throws Exception{
+
+        if(atributo.equals("comissao") && !e.getTipo().equals("comissionado"))
+            throw new Exception("Empregado nao eh comissionado.");
+
+        if (atributo.equals("banco") || atributo.equals("agencia") || atributo.equals("contaCorrente"))
+        {
+            if(!e.getMetodoPagamento().getTipo().equals("banco"))
+                throw new Exception("Empregado nao recebe em banco.");
+        }
+
+        if(atributo.equals("idSindicato") || atributo.equals("taxaSindical")){
+            if(!e.getSindicalizado())
+                throw new Exception("Empregado nao eh sindicalizado.");
+        }
+
+    }
+
     public static String validarAtributo(String atributo, String[] valores, String nome, boolean bool) throws Exception{
         if(atributo.isEmpty()) throw new Exception(nome + " nao pode ser nulo.");
 
@@ -122,32 +135,53 @@ public class Utils {
         throw new Exception("Tipo nao aplicavel.");
     }
 
+    public static String getUltimaSexta(String data) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy");
 
-    public static String getAtributoEmpregadoAssalariado(EmpregadoAssalariado empregado, String atributo) throws Exception {
-        return switch (atributo){
-            case "salario" -> Utils.doubleToString(empregado.getSalarioMensal(), false);
-            case "sindicalizado" -> empregado.getSindicalizado() ? "true" : "false";
-            case "comissao" -> throw new Exception("Empregado nao eh comissionado.");
-            default -> throw new AtributoInexistenteException();
-        };
+        LocalDate dataParse = LocalDate.parse(data, formatter);
+        LocalDate dataInicial = dataParse.with(TemporalAdjusters.previous(DayOfWeek.FRIDAY));
+
+        return dataInicial.format(formatter);
     }
 
-    public static String getAtributoEmpregadoHorista(EmpregadoHorista empregado, String atributo) throws Exception {
-        return switch (atributo){
-            case "salario" -> Utils.doubleToString(empregado.getSalarioPorHora(), false);
-            case "sindicalizado" -> empregado.getSindicalizado() ? "true" : "false";
-            case "comissao" -> throw new Exception("Empregado nao eh comissionado.");
-            default -> throw new AtributoInexistenteException();
-        };
+    public static boolean checaehSexta(String data){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy");
+
+        LocalDate dataParse = LocalDate.parse(data, formatter);
+
+        return dataParse.getDayOfWeek() == DayOfWeek.FRIDAY;
     }
 
-    public static String getAtributoEmpregadoComissionado(EmpregadoComissionado empregado, String atributo) throws Exception {
-        return switch (atributo){
-            case "salario" -> Utils.doubleToString(empregado.getSalarioMensal(), false);
-            case "sindicalizado" -> empregado.getSindicalizado() ? "true" : "false";
-            case "comissao" -> Utils.doubleToString(empregado.getTaxaDeComissao(), false);
-            default -> throw new AtributoInexistenteException();
-        };
+    public static int getDias(String dataInicial, String dataFinal){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy");
+
+        LocalDate dInicial = LocalDate.parse(dataInicial, formatter);
+        LocalDate dFinal = LocalDate.parse(dataFinal, formatter);
+
+        return (int) ChronoUnit.DAYS.between(dInicial, dFinal);
     }
+
+    public static boolean ehPrimeiroDiaMes(String data){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy");
+
+        LocalDate dataParse = LocalDate.parse(data, formatter);
+        LocalDate primeiro = dataParse.with(TemporalAdjusters.firstDayOfMonth());
+
+        return primeiro.equals(dataParse);
+    }
+
+    public static boolean ehUltimoDiaUtilMes(String data){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy");
+
+        LocalDate dataParse = LocalDate.parse(data, formatter);
+        LocalDate ultimo = dataParse.with(TemporalAdjusters.lastDayOfMonth());
+
+        while (ultimo.getDayOfWeek() == DayOfWeek.SATURDAY || ultimo.getDayOfWeek() == DayOfWeek.SUNDAY) {
+            ultimo = ultimo.minusDays(1);
+        }
+
+        return ultimo.equals(dataParse);
+    }
+
 
 }

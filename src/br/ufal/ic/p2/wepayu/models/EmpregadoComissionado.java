@@ -1,9 +1,7 @@
 package br.ufal.ic.p2.wepayu.models;
 
-import br.ufal.ic.p2.wepayu.Exception.EmpregadoNaoExisteException;
-import br.ufal.ic.p2.wepayu.Utils;
+import br.ufal.ic.p2.wepayu.services.Utils;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -11,35 +9,24 @@ import java.util.List;
 
 public class EmpregadoComissionado extends Empregado {
 
-    private Double salarioMensal;
-    private Double taxaDeComissao;
-
+    private Double comissao;
     private List<ResultadoDeVenda> vendas;
 
     public EmpregadoComissionado(){
         super();
     }
-    public EmpregadoComissionado(String nome, String endereco, String tipo, Double salarioMensal, Double taxaDeComissao) throws Exception {
-        super(nome, endereco, tipo);
-        setSalarioMensal(salarioMensal);
-        setTaxaDeComissao(taxaDeComissao);
+    public EmpregadoComissionado(String nome, String endereco, String tipo, Double salario, Double comissao) throws Exception {
+        super(nome, endereco, tipo, salario);
+        setComissao(comissao);
         this.vendas = new ArrayList<>();
     }
 
-    public Double getSalarioMensal() {
-        return salarioMensal;
+    public Double getComissao() {
+        return comissao;
     }
 
-    public void setSalarioMensal(Double salarioMensal) {
-        this.salarioMensal = salarioMensal;
-    }
-
-    public Double getTaxaDeComissao() {
-        return taxaDeComissao;
-    }
-
-    public void setTaxaDeComissao(Double taxaDeComissao) {
-        this.taxaDeComissao = taxaDeComissao;
+    public void setComissao(Double comissao) {
+        this.comissao = comissao;
     }
 
     public List<ResultadoDeVenda> getVendas() {
@@ -87,6 +74,27 @@ public class EmpregadoComissionado extends Empregado {
         }
 
         return valorTotal;
+    }
+
+    public Double getSalarioBruto(String data) throws Exception{
+
+        if(!Utils.checaehSexta(data)) return 0d;
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy");
+
+        LocalDate dInicial = LocalDate.parse(data, formatter).minusDays(13);
+        LocalDate primeiroDia = LocalDate.of(2005, 1, 1);
+
+        if (dInicial.isBefore(primeiroDia))
+        {
+            return 0d;
+        }
+
+        String dataInicial = dInicial.format(formatter);
+
+        Double percentualComissoes = getVendasRealizadas(dataInicial, data)* getComissao();
+
+        return (getSalario()*12D/52D)*2D + percentualComissoes;
     }
 
 

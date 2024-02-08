@@ -1,26 +1,22 @@
 package br.ufal.ic.p2.wepayu.models;
 
-import br.ufal.ic.p2.wepayu.Exception.EmpregadoNaoExisteException;
+import br.ufal.ic.p2.wepayu.services.Utils;
 
 import java.io.Serializable;
 
 public class EmpregadoAssalariado extends Empregado implements Serializable {
 
-    private Double salarioMensal;
-
-    public EmpregadoAssalariado(){
-        super();
-    }
-    public EmpregadoAssalariado(String nome, String endereco, String tipo, Double salarioMensal) throws Exception {
-        super(nome, endereco, tipo);
-        setSalarioMensal(salarioMensal);
+    public EmpregadoAssalariado(){}
+    public EmpregadoAssalariado(String nome, String endereco, String tipo, Double salario) throws Exception {
+        super(nome, endereco, tipo, salario);
     }
 
-    public Double getSalarioMensal() {
-        return salarioMensal;
+    public Double getSalarioBruto(String data){
+
+        if(Utils.ehUltimoDiaUtilMes(data)){
+            return getSalario();
+        }
+        return 0d;
     }
 
-    public void setSalarioMensal(Double salarioMensal) {
-        this.salarioMensal = salarioMensal;
-    }
 }
