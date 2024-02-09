@@ -1,8 +1,13 @@
 package br.ufal.ic.p2.wepayu.daos;
 
 import br.ufal.ic.p2.wepayu.models.Empregado;
+import br.ufal.ic.p2.wepayu.models.MembroSindicato;
 import br.ufal.ic.p2.wepayu.services.DBManager;
 
+/**
+ * Gerenciador de DAOs da aplicação
+ * @author thomruby
+ */
 public class DaoManager {
 
     private final DBManager session;
@@ -11,16 +16,11 @@ public class DaoManager {
     private TaxaDao taxaDao;
     private VendaDao vendaDao;
 
+    private MembroDao membroDao;
+
 
     public DaoManager(DBManager session){
         this.session = session;
-    }
-
-    public void reset(DBManager session) {
-        this.empregadoDao = new EmpregadoDao(session);
-        this.cartaoDao = new CartaoDao(session);
-        this.vendaDao = new VendaDao(session);
-        this.taxaDao = new TaxaDao(session);
     }
 
     public EmpregadoDao getEmpregadoDao() {
@@ -50,5 +50,13 @@ public class DaoManager {
         }
         return taxaDao;
     }
+
+    public MembroDao getMembroDao(){
+        if(membroDao == null){
+            membroDao = new MembroDao(session);
+        }
+        return membroDao;
+    }
+
 
 }

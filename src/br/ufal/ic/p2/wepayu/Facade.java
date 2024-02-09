@@ -1,7 +1,9 @@
 package br.ufal.ic.p2.wepayu;
 
 import br.ufal.ic.p2.wepayu.daos.*;
+import br.ufal.ic.p2.wepayu.exceptions.TipoEmpregadoInvalidoException;
 import br.ufal.ic.p2.wepayu.services.DBManager;
+import br.ufal.ic.p2.wepayu.services.FolhaBuilder;
 import br.ufal.ic.p2.wepayu.services.Utils;
 import br.ufal.ic.p2.wepayu.models.*;
 
@@ -10,20 +12,21 @@ public class Facade {
     private DBManager session;
 
     private final DaoManager daos;
+    private final FolhaBuilder folha;
 
 
     public Facade() {
         session = DBManager.getSession();
         daos = new DaoManager(session);
+        folha =  new FolhaBuilder();
     }
 
     public void zerarSistema() throws Exception{
-        session.clearALl();
-        session = session.reset();
-        daos.reset(session);
+        session.clearAll();
     }
 
-    public void encerrarSistema(){
+    public void encerrarSistema() throws Exception{
+        session.commit();
     }
 
     public String criarEmpregado(String nome, String endereco, String tipo, String salario) throws Exception {
@@ -80,15 +83,11 @@ public class Facade {
         idSindicato = Utils.validarAtributo(idSindicato, "Identificacao do sindicato", "a");
         Double taxa = Utils.formatarValor(taxaSindical, "Taxa sindical", "a");
 
-        if(daos.getEmpregadoDao().checkSindicadoId(idSindicato)){
-            throw new Exception("Ha outro empregado com esta identificacao de sindicato");
-        }
+        daos.getEmpregadoDao().checkSindicadoId(idSindicato);
 
         Empregado empregado = daos.getEmpregadoDao().getById(emp);
 
-        MembroSindicato membro = new MembroSindicato(idSindicato, taxa);
-        empregado.setMembroSindicato(membro);
-        session.commit();
+        daos.getMembroDao().create(empregado, idSindicato, taxa);
     }
 
     public String getAtributoEmpregado(String emp, String atributo) throws Exception {
@@ -122,8 +121,7 @@ public class Facade {
     public String getHorasNormaisTrabalhadas(String emp, String dataInicial, String dataFinal) throws Exception
     {
         Empregado empregado = daos.getEmpregadoDao().getById(emp);
-        if(!empregado.getClass().getSimpleName().equals("EmpregadoHorista"))
-            throw new Exception("Empregado nao eh horista.");
+        Utils.checarTipo(empregado.getTipo(), "horista");
 
         Double horas = ((EmpregadoHorista) empregado).getHorasNormaisTrabalhadas(dataInicial, dataFinal);
         return Utils.doubleToString(horas, true);
@@ -132,8 +130,7 @@ public class Facade {
     public String getHorasExtrasTrabalhadas(String emp, String dataInicial, String dataFinal) throws Exception
     {
         Empregado empregado = daos.getEmpregadoDao().getById(emp);
-        if(!empregado.getClass().getSimpleName().equals("EmpregadoHorista"))
-            throw new Exception("Empregado nao eh horista.");
+        Utils.checarTipo(empregado.getTipo(), "horista");
 
         Double horas = ((EmpregadoHorista) empregado).getHorasExtrasTrabalhadas(dataInicial, dataFinal);
         return Utils.doubleToString(horas, true);
@@ -141,8 +138,7 @@ public class Facade {
 
     public String getVendasRealizadas(String emp, String dataInicial, String dataFinal) throws Exception{
         Empregado empregado = daos.getEmpregadoDao().getById(emp);
-        if(!empregado.getClass().getSimpleName().equals("EmpregadoComissionado"))
-            throw new Exception("Empregado nao eh comissionado.");
+        Utils.checarTipo(empregado.getTipo(), "comissionado");
 
         Double valor = ((EmpregadoComissionado) empregado).getVendasRealizadas(dataInicial, dataFinal);
         return Utils.doubleToString(valor, false);
@@ -153,20 +149,19 @@ public class Facade {
         Empregado empregado = daos.getEmpregadoDao().getById(emp);
 
         if(!empregado.getSindicalizado())
-            throw new Exception("Empregado nao eh sindicalizado.");
+            throw new TipoEmpregadoInvalidoException("sindicalizado");
 
         Double valor = empregado.getMembroSindicato().getTaxasServico(dataInicial,dataFinal);
         return Utils.doubleToString(valor, false);
     }
 
     public String totalFolha(String data) throws Exception{
-        return Utils.doubleToString(daos.getEmpregadoDao().getTotalEmpregados(data), false);
+        return Utils.doubleToString(folha.getTotalFolha(data),  false);
     }
 
-    public void rodaFolha(String data, String saida) throws Exception{
-        FolhaFactory folha = new FolhaFactory();
 
-        //folha.geraFolha(data, saida);
+    public void rodaFolha(String data, String saida) throws Exception{
+        folha.geraFolha(data, saida);
     }
 
 }

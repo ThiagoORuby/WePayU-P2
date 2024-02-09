@@ -2,12 +2,18 @@ package br.ufal.ic.p2.wepayu.daos;
 
 import br.ufal.ic.p2.wepayu.exceptions.AtributoNaoExisteException;
 import br.ufal.ic.p2.wepayu.exceptions.EmpregadoNaoExisteException;
+import br.ufal.ic.p2.wepayu.exceptions.TipoInvalidoException;
 import br.ufal.ic.p2.wepayu.models.*;
 import br.ufal.ic.p2.wepayu.services.DBManager;
+import br.ufal.ic.p2.wepayu.services.Settings;
 import br.ufal.ic.p2.wepayu.services.Utils;
 
 import java.util.*;
 
+/**
+ * Data Access Object (DAO) para gerenciamento de Empregados
+ * @author thomruby
+ */
 public class EmpregadoDao{
 
     private final DBManager session;
@@ -16,8 +22,7 @@ public class EmpregadoDao{
         this.session = session;
     }
 
-    public Empregado create(String nome, String endereco, String tipo, String salario) throws Exception
-    {
+    public Empregado create(String nome, String endereco, String tipo, String salario) throws Exception {
         Empregado empregado = null;
         switch (tipo) {
             case "horista" ->
@@ -32,7 +37,7 @@ public class EmpregadoDao{
                         tipo,
                         Utils.formatarValor(salario, "Salario", "o"));
 
-            default -> Utils.checaTipo(tipo);
+            default -> Utils.checarTipo(tipo);
         }
         session.add(empregado);
         session.commit();
@@ -41,7 +46,7 @@ public class EmpregadoDao{
     }
 
     public Empregado create(String nome, String endereco, String tipo, String salario, String comissao) throws Exception{
-        EmpregadoComissionado empregado;
+        EmpregadoComissionado empregado = null;
         if (tipo.equals("comissionado"))
             empregado = new EmpregadoComissionado(nome,
                     endereco,
@@ -49,7 +54,7 @@ public class EmpregadoDao{
                     Utils.formatarValor(salario, "Salario", "o"),
                     Utils.formatarValor(comissao, "Comissao", "a"));
         else
-            throw new Exception("Tipo nao aplicavel.");
+            Utils.checarTipo(tipo);
 
         session.add(empregado);
         session.commit();
@@ -110,32 +115,19 @@ public class EmpregadoDao{
             case "endereco" -> empregado.getEndereco();
             case "tipo" -> empregado.getTipo();
             case "salario" -> Utils.doubleToString(empregado.getSalario(), false);
-            case "comissao" -> Utils.doubleToString(((EmpregadoComissionado) empregado).getComissao(), false);
+            case "comissao" -> Utils.doubleToString(((EmpregadoComissionado) empregado).getComissao(),
+                    false);
             case "sindicalizado" -> empregado.getSindicalizado() ? "true" : "false";
             case "metodoPagamento" -> empregado.getMetodoPagamento().getTipo();
             case "banco" ->  empregado.getMetodoPagamento().getBanco();
             case "agencia" ->  empregado.getMetodoPagamento().getAgencia();
             case "contaCorrente" -> empregado.getMetodoPagamento().getContaCorrente();
             case "idSindicato" -> empregado.getMembroSindicato().getIdMembro();
-            case "taxaSindical" -> Utils.doubleToString(empregado.getMembroSindicato().getTaxaSindical(), false);
+            case "taxaSindical" -> Utils.doubleToString(empregado.getMembroSindicato().getTaxaSindical(),
+                    false);
             default -> throw new AtributoNaoExisteException();
         };
     }
-
-    public Double getTotalEmpregados(String data) throws Exception{
-        Double total = 0d;
-        for(Map.Entry<String, Empregado> emp: session.query().entrySet()){
-            Empregado e = emp.getValue();
-            switch (e.getTipo())
-            {
-                case ("horista") -> total += ((EmpregadoHorista) e).getSalarioBruto(data);
-                case ("assalariado") -> total += ((EmpregadoAssalariado) e).getSalarioBruto(data);
-                case ("comissionado") -> total += ((EmpregadoComissionado) e).getSalarioBruto(data);
-            }
-        }
-        return total;
-    }
-
 
     public void updateAtributoById(String id, String atributo, String valor, String valor1) throws Exception
     {
@@ -143,17 +135,18 @@ public class EmpregadoDao{
 
         Utils.checarAtributo(empregado, atributo);
 
-        String[] valores = {"true", "false"};
+
         switch (atributo) {
             case "nome" -> empregado.setNome(valor);
             case "endereco" -> empregado.setEndereco(valor);
             case "sindicalizado" -> {
-                valor = Utils.validarAtributo(valor, valores, "Valor", true);
+                valor = Utils.validarAtributo(valor, Settings.BOOLEANOS, "Valor", true);
                 if(valor.equals("false")) empregado.setMembroSindicato(null);
             }
             case "tipo" -> updateTipo(empregado, valor, valor1);
             case "salario" -> empregado.setSalario(Utils.formatarValor(valor, "Salario", "o"));
-            case "comissao" -> ((EmpregadoComissionado) empregado).setComissao(Utils.formatarValor(valor, "Comissao", "a"));
+            case "comissao" -> ((EmpregadoComissionado) empregado).setComissao(
+                    Utils.formatarValor(valor, "Comissao", "a"));
             default -> throw new AtributoNaoExisteException();
         }
         session.commit();
@@ -161,7 +154,7 @@ public class EmpregadoDao{
 
     public void updateTipo(Empregado e, String tipo, String valor) throws Exception{
         String id = e.getId();
-        Empregado novoEmp = null;
+        Empregado novoEmp;
         switch (tipo)
         {
             case "assalariado" ->
@@ -170,12 +163,11 @@ public class EmpregadoDao{
                 novoEmp = convertToHorista(e, valor);
             case "comissionado" ->
                 novoEmp = convertToComissionado(e, valor);
-            default -> throw new Exception("Tipo invalido.");
+            default -> throw new TipoInvalidoException();
         }
 
         novoEmp.setId(id);
         session.update(id, novoEmp);
-        session.commit();
     }
 
     public Empregado convertToAssalariado(Empregado e, String valor) throws Exception{
@@ -221,19 +213,18 @@ public class EmpregadoDao{
         Empregado empregado = session.query().remove(id);
         session.commit();
         if(empregado == null)
-            throw new Exception("Empregado nao existe.");
+            throw new EmpregadoNaoExisteException();
     }
 
-    public boolean checkSindicadoId(String idSindicato)
+    public void checkSindicadoId(String idSindicato) throws Exception
     {
         for(Map.Entry<String, Empregado> emp: session.query().entrySet()) {
             Empregado empregado = emp.getValue();
             if (empregado.getSindicalizado()) {
                 if (empregado.getMembroSindicato().getIdMembro().equals(idSindicato))
-                    return true;
+                    throw new Exception("Ha outro empregado com esta identificacao de sindicato");
             }
         }
-        return false;
     }
 
 }

@@ -1,23 +1,37 @@
 package br.ufal.ic.p2.wepayu.services;
 
-import br.ufal.ic.p2.wepayu.exceptions.DataInvalidaException;
+import br.ufal.ic.p2.wepayu.exceptions.*;
 import br.ufal.ic.p2.wepayu.models.Empregado;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Métodos para manipulação dos dados da aplicaçãos
+ * @author thomruby
+ */
 public class Utils {
 
-
+    /**
+     * Converte String em Double tratando Exceções
+     * @param valor String a ser convertida
+     * @param nome Nome associado ao valor
+     * @param sufix Sufixo de desinência de gênero
+     * @return valor em Double
+     * @throws ValorNuloException
+     * @throws ValorNaoNumericoException
+     * @throws ValorNegativoException
+     */
     public static Double formatarValor(String valor, String nome, String sufix) throws Exception {
         Double valorConvertido;
         try{
@@ -26,26 +40,38 @@ public class Utils {
         catch (NumberFormatException e){
             if (valor.isEmpty())
             {
-                throw new Exception(nome + " nao pode ser nul" + sufix + ".");
+                throw new ValorNuloException(nome, sufix);
             }
             else{
-                throw new Exception(nome + " deve ser numeric" + sufix + ".");
+                throw new ValorNaoNumericoException(nome, sufix);
             }
         }
 
         if(valorConvertido < 0){
-            throw new Exception(nome + " deve ser nao-negativ" + sufix + ".");
+            throw new ValorNegativoException(nome, sufix);
         }
-
         return valorConvertido;
     }
 
-    public static String doubleToString(Double valor, boolean lazy){
-        DecimalFormat formatter = new DecimalFormat(lazy ? "#.##" : "0.00");
+    /**
+     * Converter um valor Double para um String
+     * @param valor valor a ser convertido
+     * @param dynamic booleano que indica a dinamicidade da parte decimal
+     * @return
+     */
+    public static String doubleToString(Double valor, boolean dynamic){;
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(new Locale("pt", "BR"));
+        DecimalFormat formatter = new DecimalFormat(dynamic ? "#.##" : "0.00", symbols);
         return formatter.format(valor);
     }
 
-    public static String validarData(String data) throws Exception{
+    /**
+     * Valida uma data em relação a quantidade de dias em cada mês
+     * @param data String data a ser validada
+     * @return String da data caso seja válida
+     * @throws DataInvalidaException
+     */
+    public static String validarData(String data) throws DataInvalidaException {
         Pattern pattern = Pattern.compile("([0-3]?[0-9])/(0?[1-9]|1[0-2])/(\\d{4})");
 
         Matcher matcher = pattern.matcher(data);
@@ -75,10 +101,26 @@ public class Utils {
         return data;
     }
 
+    public static LocalDate formatarData(String data, String nome) throws Exception{
+
+        LocalDate dataParse;
+
+        try {dataParse = LocalDate.parse(validarData(data), Settings.formatter);}
+        catch (Exception e) {throw new DataInvalidaException(nome);}
+
+        return dataParse;
+    }
+
+    /**
+     * Verifica a validade de um atributo
+     * @param e {@link Empregado}
+     * @param atributo atributo a ser verificado
+     * @throws Exception
+     */
     public static void checarAtributo(Empregado e, String atributo) throws Exception{
 
         if(atributo.equals("comissao") && !e.getTipo().equals("comissionado"))
-            throw new Exception("Empregado nao eh comissionado.");
+            throw new TipoEmpregadoInvalidoException("comissionado");
 
         if (atributo.equals("banco") || atributo.equals("agencia") || atributo.equals("contaCorrente"))
         {
@@ -88,17 +130,27 @@ public class Utils {
 
         if(atributo.equals("idSindicato") || atributo.equals("taxaSindical")){
             if(!e.getSindicalizado())
-                throw new Exception("Empregado nao eh sindicalizado.");
+                throw new TipoEmpregadoInvalidoException("sindicalizado");
         }
 
     }
 
-    public static String validarAtributo(String atributo, String[] valores, String nome, boolean bool) throws Exception{
-        if(atributo.isEmpty()) throw new Exception(nome + " nao pode ser nulo.");
+    /**
+     * Valida atributo comparando com os valores passados
+     * @param atributo valor do atributo a ser validado
+     * @param valores valores a serem comparados
+     * @param nome nome do atributo
+     * @param bool booleando que indica se o atributo é booleano
+     * @return
+     * @throws Exception
+     */
+    public static String validarAtributo(String atributo, String[] valores,
+                                         String nome, boolean bool) throws Exception{
+        if(atributo.isEmpty()) throw new ValorNuloException(nome, "o");
 
         if(!Arrays.asList(valores).contains(atributo)) {
             if (bool) {
-                throw new Exception(nome + " deve ser true ou false.");
+                throw new ValorNaoBooleanoException(nome);
             } else throw new Exception(nome + " invalido.");
         }
         return atributo;
@@ -106,7 +158,7 @@ public class Utils {
 
     public static String validarAtributo(String atributo, String nome, String sufix) throws Exception{
         if(atributo != null)
-            if(atributo.isEmpty()) throw new Exception(nome + " nao pode ser nul" + sufix + ".");
+            if(atributo.isEmpty()) throw new ValorNuloException(nome, sufix);
 
         return atributo;
     }
@@ -124,63 +176,104 @@ public class Utils {
         if(valorConvertido <= 0){
             throw new Exception("Valor deve ser positivo.");
         }
+
         return valorConvertido;
     }
 
-    public static void checaTipo(String tipo) throws Exception {
-        List<String> tipos = Arrays.asList("horista", "comissionado", "assalariado");
-        if(!tipos.contains(tipo)){
-            throw  new Exception("Tipo invalido.");
+    public static void checarTipo(String tipo) throws Exception {
+        if(!Settings.TIPOS.contains(tipo)){
+            throw  new TipoInvalidoException();
         }
-        throw new Exception("Tipo nao aplicavel.");
+        throw new TipoNaoAplicavelException();
     }
 
-    public static String getUltimaSexta(String data) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy");
+    public static void checarTipo(String tipo, String comparador) throws Exception {
+        if(!tipo.equals(comparador))
+            throw new TipoEmpregadoInvalidoException(comparador);
 
-        LocalDate dataParse = LocalDate.parse(data, formatter);
-        LocalDate dataInicial = dataParse.with(TemporalAdjusters.previous(DayOfWeek.FRIDAY));
-
-        return dataInicial.format(formatter);
-    }
-
-    public static boolean checaehSexta(String data){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy");
-
-        LocalDate dataParse = LocalDate.parse(data, formatter);
-
-        return dataParse.getDayOfWeek() == DayOfWeek.FRIDAY;
     }
 
     public static int getDias(String dataInicial, String dataFinal){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy");
-
-        LocalDate dInicial = LocalDate.parse(dataInicial, formatter);
-        LocalDate dFinal = LocalDate.parse(dataFinal, formatter);
+        LocalDate dInicial = LocalDate.parse(dataInicial, Settings.formatter);
+        LocalDate dFinal = LocalDate.parse(dataFinal, Settings.formatter);
 
         return (int) ChronoUnit.DAYS.between(dInicial, dFinal);
     }
 
-    public static boolean ehPrimeiroDiaMes(String data){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy");
 
-        LocalDate dataParse = LocalDate.parse(data, formatter);
-        LocalDate primeiro = dataParse.with(TemporalAdjusters.firstDayOfMonth());
+    public static String getUltimaSexta(String data) {
+        LocalDate dataParse = LocalDate.parse(data, Settings.formatter);
+        LocalDate dataInicial = dataParse.with(TemporalAdjusters.previous(DayOfWeek.FRIDAY));
 
-        return primeiro.equals(dataParse);
+        return dataInicial.format(Settings.formatter);
     }
 
-    public static boolean ehUltimoDiaUtilMes(String data){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy");
+    public static String getProximaSexta(String data) {
+        LocalDate dataParse = LocalDate.parse(data, Settings.formatter);
+        LocalDate dataInicial = dataParse.with(TemporalAdjusters.next(DayOfWeek.FRIDAY));
 
-        LocalDate dataParse = LocalDate.parse(data, formatter);
+        return dataInicial.format(Settings.formatter);
+    }
+
+    public static boolean ehSexta(String data){
+        LocalDate dataParse = LocalDate.parse(data, Settings.formatter);
+
+        return dataParse.getDayOfWeek() == DayOfWeek.FRIDAY;
+    }
+
+    public static boolean ehUltimoDiaMes(String data){
+        LocalDate dataParse = LocalDate.parse(data, Settings.formatter);
         LocalDate ultimo = dataParse.with(TemporalAdjusters.lastDayOfMonth());
 
-        while (ultimo.getDayOfWeek() == DayOfWeek.SATURDAY || ultimo.getDayOfWeek() == DayOfWeek.SUNDAY) {
-            ultimo = ultimo.minusDays(1);
+        return ultimo.equals(dataParse);
+    }
+
+    public static String getPrimeiroDiaMes(String data){
+        LocalDate dataParse = LocalDate.parse(data, Settings.formatter);
+
+        return dataParse.with(TemporalAdjusters.firstDayOfMonth()).
+                format(Settings.formatter);
+    }
+
+    public static boolean ehDiaDePagamentoComissionado(String data) {
+        LocalDate dataParse = LocalDate.parse(data, Settings.formatter);
+
+        // Obtém dia da semana da data
+        DayOfWeek diaDaSemana = dataParse.getDayOfWeek();
+
+        // Verifica se é sexta-feira
+        if (diaDaSemana != DayOfWeek.FRIDAY) {
+            return false;
         }
 
-        return ultimo.equals(dataParse);
+        // Calcula a data do contratamento (1/1/2005)
+        LocalDate dataPrimeiroPagamento = LocalDate.of(2005, 1, 1);
+
+        // Calcula a diferença em dias entre a data e a data do contratamento
+        long diferencaEmDias = ChronoUnit.DAYS.between(dataPrimeiroPagamento, dataParse);
+
+        // Verifica se a diferença em dias é um múltiplo de 14 (dias entre pagamentos)
+        return (diferencaEmDias + 1) % Settings.DIAS_ENTRE_PAGAMENTOS == 0;
+    }
+
+    public static String getUltimoPagamentoComissionado(String data) {
+        LocalDate dataParse = LocalDate.parse(data, Settings.formatter);
+        LocalDate dataInicial = dataParse.minusDays(13);
+        return dataInicial.format(Settings.formatter);
+    }
+
+    public static List<Double> somarListas(List<Double> lista1, List<Double> lista2) throws Exception{
+        if(lista1.isEmpty()) return lista2;
+        if(lista2.isEmpty()) return lista1;
+        if(lista1.size() != lista2.size()) throw new ListasDiferentesException();
+
+        List<Double> soma = new ArrayList<>();
+
+        for(int i = 0; i < lista1.size(); i++){
+            soma.add(lista1.get(i) + lista2.get(i));
+        }
+
+        return soma;
     }
 
 

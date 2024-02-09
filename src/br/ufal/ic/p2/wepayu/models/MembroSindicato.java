@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class MembroSindicato implements Serializable {
@@ -13,13 +14,16 @@ public class MembroSindicato implements Serializable {
     private String idMembro;
     private Double taxaSindical;
 
+
     private List<TaxaServico> taxas;
+    private HashSet<TaxaServico> taxasExtras;
 
     public MembroSindicato(){}
     public MembroSindicato(String idMembro, Double taxaSindical) {
         setIdMembro(idMembro);
         setTaxaSindical(taxaSindical);
         this.taxas = new ArrayList<>();
+        this.taxasExtras = new HashSet<>();
     }
 
     public String getIdMembro() {
@@ -50,7 +54,19 @@ public class MembroSindicato implements Serializable {
         this.taxas.add(taxa);
     }
 
-    public double getTaxasServico(String dataInicial, String dataFinal) throws Exception{
+    public HashSet<TaxaServico> getTaxasExtras() {
+        return taxasExtras;
+    }
+
+    public void setTaxasExtras(HashSet<TaxaServico> taxasExtras) {
+        this.taxasExtras = taxasExtras;
+    }
+
+    public void setTaxaExtra(TaxaServico taxaExtra){
+        this.taxasExtras.add(taxaExtra);
+    }
+
+    public Double getTaxasServico(String dataInicial, String dataFinal) throws Exception{
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy");
 
         LocalDate dInicial = null;
@@ -80,6 +96,15 @@ public class MembroSindicato implements Serializable {
             }
         }
 
+        return valorTotal;
+    }
+
+    public Double getAndClearTaxasExtras() {
+        Double valorTotal = 0d;
+        for(TaxaServico taxa: taxasExtras){
+                valorTotal += taxa.getValor();
+        }
+        taxasExtras.clear();
         return valorTotal;
     }
 

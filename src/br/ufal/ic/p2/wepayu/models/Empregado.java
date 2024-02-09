@@ -84,6 +84,18 @@ public class Empregado implements Serializable{
         this.metodoPagamento = metodoPagamento;
     }
 
+    public String getDadosPagamento(){
+        MetodoPagamento metodo = getMetodoPagamento();
+
+        return switch (metodo.getTipo()){
+            case "emMaos" -> "Em maos";
+            case "banco" -> String.format("%s, Ag. %s CC %s", metodo.getBanco(),
+                    metodo.getAgencia(), metodo.getContaCorrente());
+            case "correios" -> String.format("Correios, %s", getEndereco());
+            default -> "";
+        };
+    }
+
     public Double getSalario() {
         return salario;
     }

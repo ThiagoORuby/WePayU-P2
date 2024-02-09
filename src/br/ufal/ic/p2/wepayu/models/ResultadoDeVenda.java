@@ -7,7 +7,6 @@ public class ResultadoDeVenda implements Serializable {
     private String data;
     private Double valor;
 
-
     public ResultadoDeVenda(){}
     public ResultadoDeVenda(String data, Double valor) {
         setData(data);

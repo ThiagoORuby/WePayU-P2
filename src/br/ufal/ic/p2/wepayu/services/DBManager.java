@@ -9,16 +9,24 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 
+/**
+ * Classe de manipulação da base de dados (XML)
+ * @author thomruby
+ */
 public class DBManager {
 
     private static DBManager session;
-
     private final LinkedHashMap<String, Empregado> empregados;
+
 
     private DBManager() {
         this.empregados = getAllData();
     }
 
+    /**
+     * Retorna uma instância única de acesso ao banco de dados
+     * @return singleton para acesso ao banco
+     */
     public static DBManager getSession() {
         if(session == null)
         {
@@ -27,25 +35,27 @@ public class DBManager {
         return session;
     }
 
-    public void clearALl() throws Exception{
+    /**
+     * Limpa o conteúdo do banco de dados
+     */
+    public void clearAll() {
+        empregados.clear();
         try {
-            Files.delete(Path.of("db.xml"));
+            Files.delete(Path.of(Settings.DB_PATH));
         }catch (Exception e){
-            throw new Exception("Arquivo nao existe.");
+            System.out.println("Arquivo nao existe");
         }
     }
 
-    public DBManager reset() throws Exception{
-        session = new DBManager();
-        return session;
-    }
-
-
-    private LinkedHashMap<String, Empregado> getAllData()
-    {
+    /**
+     * Retorna o LinkedHashMap com dados dos empregados salvos no XML
+     * @return LinkedHashMap dos empregados
+     */
+    private LinkedHashMap<String, Empregado> getAllData() {
         LinkedHashMap<String, Empregado> empregados = new LinkedHashMap<>();
 
-        try(BufferedInputStream file = new BufferedInputStream(new FileInputStream(Constants.DB_PATH))){
+        try(BufferedInputStream file = new BufferedInputStream(
+                new FileInputStream(Settings.DB_PATH))){
             XMLDecoder decoder = new XMLDecoder(file);
             while(true){
                 try{
@@ -62,12 +72,20 @@ public class DBManager {
         return empregados;
     }
 
-    public LinkedHashMap<String, Empregado> query(){
+    /**
+     * Retorna o atributo empregados
+     * @return LinkedHashMap dos empregados
+     */
+    public LinkedHashMap<String, Empregado> query() {
         return empregados;
     }
 
-    public void commit() throws Exception{
-        try (BufferedOutputStream file = new BufferedOutputStream(new FileOutputStream(Constants.DB_PATH))) {
+    /**
+     * Salva os dados de empregados no XML
+     */
+    public void commit() {
+        try (BufferedOutputStream file = new BufferedOutputStream(
+                new FileOutputStream(Settings.DB_PATH))) {
             XMLEncoder encoder = new XMLEncoder(file);
             empregados.forEach((id, empregado) -> {
                 encoder.writeObject(empregado);
@@ -78,13 +96,21 @@ public class DBManager {
         }
     }
 
-    public void add(Empregado empregado) throws Exception{
+    /**
+     * Adiciona um novo empregado
+     * @param empregado {@link Empregado} a ser adicionado
+     */
+    public void add(Empregado empregado) {
         empregados.put(empregado.getId(), empregado);
     }
 
-    public void update(String id, Empregado empregado) throws Exception{
+    /**
+     * Atualiza os dados de um empregado
+     * @param id id do empregado
+     * @param empregado {@link Empregado} a ser atualizado
+     */
+    public void update(String id, Empregado empregado) {
         empregados.put(id, empregado);
     }
-
 
 }
