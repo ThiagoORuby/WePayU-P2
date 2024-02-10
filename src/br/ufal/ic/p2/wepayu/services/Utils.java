@@ -246,10 +246,10 @@ public class Utils {
             return false;
         }
 
-        // Calcula a data do contratamento (1/1/2005)
+        // Calcula a data da contratação (1/1/2005)
         LocalDate dataPrimeiroPagamento = LocalDate.of(2005, 1, 1);
 
-        // Calcula a diferença em dias entre a data e a data do contratamento
+        // Calcula a diferença em dias entre a data e a data da contratação
         long diferencaEmDias = ChronoUnit.DAYS.between(dataPrimeiroPagamento, dataParse);
 
         // Verifica se a diferença em dias é um múltiplo de 14 (dias entre pagamentos)
