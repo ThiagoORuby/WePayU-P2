@@ -101,6 +101,13 @@ public class Utils {
         return data;
     }
 
+    /**
+     * Formata uma data String para LocalDate
+     * @param data String data a ser convertida
+     * @param nome Nome do atributo para exceção
+     * @return {@link LocalDate} Data convertida
+     * @throws Exception
+     */
     public static LocalDate formatarData(String data, String nome) throws Exception{
 
         LocalDate dataParse;
