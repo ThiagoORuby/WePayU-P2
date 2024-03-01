@@ -1,5 +1,7 @@
 package br.ufal.ic.p2.wepayu.models;
 
+import br.ufal.ic.p2.wepayu.exceptions.ValorNuloException;
+
 import java.io.Serializable;
 import java.util.*;
 
@@ -44,14 +46,14 @@ public class Empregado implements Serializable{
 
     public void setNome(String nome) throws Exception {
         if(nome.isEmpty()){
-            throw new Exception("Nome nao pode ser nulo.");
+            throw new ValorNuloException("Nome", "o");
         }
         this.nome = nome;
     }
 
     public void setEndereco(String endereco) throws Exception {
         if(endereco.isEmpty()) {
-            throw new Exception("Endereco nao pode ser nulo.");
+            throw new ValorNuloException("Endereco", "o");
         }
         this.endereco = endereco;
     }

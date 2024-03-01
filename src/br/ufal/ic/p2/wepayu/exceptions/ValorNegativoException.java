@@ -5,4 +5,8 @@ public class ValorNegativoException extends Exception {
     public ValorNegativoException(String nome, String sufix) {
         super(nome + " deve ser nao-negativ" + sufix + ".");
     }
+
+    public ValorNegativoException(){
+        super("Valor deve ser positivo.");
+    }
 }

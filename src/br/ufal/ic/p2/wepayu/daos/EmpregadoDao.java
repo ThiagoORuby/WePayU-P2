@@ -1,8 +1,6 @@
 package br.ufal.ic.p2.wepayu.daos;
 
-import br.ufal.ic.p2.wepayu.exceptions.AtributoNaoExisteException;
-import br.ufal.ic.p2.wepayu.exceptions.EmpregadoNaoExisteException;
-import br.ufal.ic.p2.wepayu.exceptions.TipoInvalidoException;
+import br.ufal.ic.p2.wepayu.exceptions.*;
 import br.ufal.ic.p2.wepayu.models.*;
 import br.ufal.ic.p2.wepayu.services.DBManager;
 import br.ufal.ic.p2.wepayu.services.Settings;
@@ -66,7 +64,7 @@ public class EmpregadoDao{
 
         if(id.isEmpty())
         {
-            throw new Exception("Identificacao do empregado nao pode ser nula.");
+            throw new ValorNuloException("Identificacao do empregado", "a");
         }
 
         Empregado empregado = session.query().get(id);
@@ -85,14 +83,14 @@ public class EmpregadoDao{
             }
         }
 
-        if (empregados.isEmpty()) throw new Exception("Nao ha empregado com esse nome.");
+        if (empregados.isEmpty()) throw new EmpregadoNaoExisteException("nome");
 
         return empregados;
     }
 
     public Empregado getByIdSindicato(String idSindicato) throws Exception{
 
-        if(idSindicato.isEmpty()) throw new Exception("Identificacao do membro nao pode ser nula.");
+        if(idSindicato.isEmpty()) throw new ValorNuloException("Identificacao do membro", "a");
 
         for(Map.Entry<String, Empregado> emp: session.query().entrySet()) {
             Empregado empregado = emp.getValue();
@@ -102,7 +100,7 @@ public class EmpregadoDao{
                 }
             }
         }
-        throw new Exception("Membro nao existe.");
+        throw new MembroNaoExisteException();
     }
 
     public String getAtributo(String emp, String atributo) throws Exception{
@@ -189,8 +187,8 @@ public class EmpregadoDao{
     public void updatePagamentoEmpregado(String emp, String tipo, String banco, String agencia, String contaCorrente) throws Exception{
         Empregado empregado = getById(emp);
 
-        String[] tipos = {"banco", "emMaos", "correios"};
-        tipo = Utils.validarAtributo(tipo, tipos, "Metodo de pagamento", false);
+
+        tipo = Utils.validarAtributo(tipo, Settings.METODOS_PAGAMENTO, "Metodo de pagamento", false);
         banco = Utils.validarAtributo(banco, "Banco", "o");
         agencia = Utils.validarAtributo(agencia, "Agencia", "o");
         contaCorrente = Utils.validarAtributo(contaCorrente, "Conta corrente", "o");
@@ -208,7 +206,7 @@ public class EmpregadoDao{
     public void deleteById(String id) throws Exception {
 
         if(id.isEmpty())
-            throw new Exception("Identificacao do empregado nao pode ser nula.");
+            throw new ValorNuloException("Identificacao do empregado", "a");
 
         Empregado empregado = session.query().remove(id);
         session.commit();
@@ -222,7 +220,7 @@ public class EmpregadoDao{
             Empregado empregado = emp.getValue();
             if (empregado.getSindicalizado()) {
                 if (empregado.getMembroSindicato().getIdMembro().equals(idSindicato))
-                    throw new Exception("Ha outro empregado com esta identificacao de sindicato");
+                    throw new EmpregadoJaExisteException();
             }
         }
     }

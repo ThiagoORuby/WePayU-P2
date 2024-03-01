@@ -1,5 +1,6 @@
 package br.ufal.ic.p2.wepayu.daos;
 
+import br.ufal.ic.p2.wepayu.exceptions.TipoEmpregadoInvalidoException;
 import br.ufal.ic.p2.wepayu.models.Empregado;
 import br.ufal.ic.p2.wepayu.models.EmpregadoComissionado;
 import br.ufal.ic.p2.wepayu.models.ResultadoDeVenda;
@@ -16,7 +17,7 @@ public class VendaDao {
 
     public void create(Empregado empregado, String data, String valor) throws Exception{
         if(!empregado.getTipo().equals("comissionado"))
-            throw new Exception("Empregado nao eh comissionado.");
+            throw new TipoEmpregadoInvalidoException("comissionado");
 
         ResultadoDeVenda venda = new ResultadoDeVenda(
                 Utils.validarData(data),

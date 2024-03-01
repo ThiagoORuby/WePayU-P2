@@ -132,7 +132,7 @@ public class Utils {
         if (atributo.equals("banco") || atributo.equals("agencia") || atributo.equals("contaCorrente"))
         {
             if(!e.getMetodoPagamento().getTipo().equals("banco"))
-                throw new Exception("Empregado nao recebe em banco.");
+                throw new MetodoPagamentoException();
         }
 
         if(atributo.equals("idSindicato") || atributo.equals("taxaSindical")){
@@ -158,7 +158,7 @@ public class Utils {
         if(!Arrays.asList(valores).contains(atributo)) {
             if (bool) {
                 throw new ValorNaoBooleanoException(nome);
-            } else throw new Exception(nome + " invalido.");
+            } else throw new TipoInvalidoException("Metodo de pagamento");
         }
         return atributo;
     }
@@ -172,7 +172,7 @@ public class Utils {
 
     public static String validarHoras(String horas) throws Exception{
         if(Double.parseDouble(horas.replace(",", ".")) <= 0){
-            throw new Exception("Horas devem ser positivas.");
+            throw new HorasNegativasException();
         }
         return horas;
     }
@@ -181,7 +181,7 @@ public class Utils {
         valor = validarAtributo(valor, "Taxa sindical", "a");
         Double valorConvertido = Double.parseDouble(valor.replace(",", "."));
         if(valorConvertido <= 0){
-            throw new Exception("Valor deve ser positivo.");
+            throw new ValorNegativoException();
         }
 
         return valorConvertido;

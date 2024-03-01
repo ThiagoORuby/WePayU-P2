@@ -16,7 +16,9 @@ public class Settings {
     public static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy");
     public static final List<String> TIPOS = Arrays.asList("horista", "comissionado", "assalariado");
 
+    public static final String[] METODOS_PAGAMENTO = {"banco", "emMaos", "correios"};
     public static final String[] BOOLEANOS = {"true", "false"};
+
 
     public static final String HEADER_HORISTAS = "templates/horistas.txt";
     public static final String HEADER_ASSALARIADOS = "templates/assalariados.txt";

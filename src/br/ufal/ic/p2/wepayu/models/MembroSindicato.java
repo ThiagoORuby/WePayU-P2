@@ -1,5 +1,7 @@
 package br.ufal.ic.p2.wepayu.models;
 
+import br.ufal.ic.p2.wepayu.exceptions.DataInicialPosteriorException;
+import br.ufal.ic.p2.wepayu.services.Settings;
 import br.ufal.ic.p2.wepayu.services.Utils;
 
 import java.io.Serializable;
@@ -67,24 +69,19 @@ public class MembroSindicato implements Serializable {
     }
 
     public Double getTaxasServico(String dataInicial, String dataFinal) throws Exception{
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy");
-
-        LocalDate dInicial = null;
-        LocalDate dFinal = null;
-
-        try {dInicial = LocalDate.parse(Utils.validarData(dataInicial), formatter);}
-        catch (Exception e) {throw new Exception("Data inicial invalida.");}
-
-        try{dFinal = LocalDate.parse(Utils.validarData(dataFinal), formatter);}
-        catch (Exception e) {throw new Exception("Data final invalida.");}
-
-        if(dInicial.isAfter(dFinal)) throw new Exception("Data inicial nao pode ser posterior aa data final.");
-
-        if(dInicial.isEqual(dFinal)) return 0d;
-
         Double valorTotal = 0d;
+
+        LocalDate dInicial = Utils.formatarData(dataInicial, "inicial");
+        LocalDate dFinal = Utils.formatarData(dataFinal, "final");
+
+        if(dInicial.isAfter(dFinal))
+            throw new DataInicialPosteriorException();
+
+        if(dInicial.isEqual(dFinal))
+            return valorTotal;
+
         for(TaxaServico taxa: taxas){
-            LocalDate data = LocalDate.parse(taxa.getData(), formatter);
+            LocalDate data = LocalDate.parse(taxa.getData(), Settings.formatter);
             if(data.isEqual(dInicial))
             {
                 valorTotal += taxa.getValor();

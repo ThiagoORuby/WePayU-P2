@@ -1,5 +1,6 @@
 package br.ufal.ic.p2.wepayu.daos;
 
+import br.ufal.ic.p2.wepayu.exceptions.TipoEmpregadoInvalidoException;
 import br.ufal.ic.p2.wepayu.models.CartaoDePonto;
 import br.ufal.ic.p2.wepayu.models.Empregado;
 import br.ufal.ic.p2.wepayu.models.EmpregadoHorista;
@@ -16,7 +17,7 @@ public class CartaoDao {
 
     public void create(Empregado empregado, String data, String horas) throws Exception{
         if(!empregado.getTipo().equals("horista"))
-            throw new Exception("Empregado nao eh horista.");
+            throw new TipoEmpregadoInvalidoException("horista");
 
         CartaoDePonto cartao = new CartaoDePonto(
                 Utils.validarData(data)
