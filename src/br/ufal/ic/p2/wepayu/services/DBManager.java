@@ -7,6 +7,7 @@ import java.beans.XMLEncoder;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 /**
@@ -16,7 +17,8 @@ import java.util.LinkedHashMap;
 public class DBManager {
 
     private static DBManager session;
-    private final LinkedHashMap<String, Empregado> empregados;
+    private boolean isClosed;
+    private LinkedHashMap<String, Empregado> empregados;
 
 
     private DBManager() {
@@ -31,6 +33,7 @@ public class DBManager {
         if(session == null)
         {
             session = new DBManager();
+            session.isClosed = false;
         }
         return session;
     }
@@ -45,6 +48,7 @@ public class DBManager {
         }catch (Exception e){
             System.out.println("Arquivo nao existe");
         }
+        isClosed = false;
     }
 
     /**
@@ -111,6 +115,27 @@ public class DBManager {
      */
     public void update(String id, Empregado empregado) {
         empregados.put(id, empregado);
+    }
+
+    public String size(){
+        return String.valueOf(this.empregados.size());
+    }
+
+    public void restore(Memento snapshot) throws Exception {
+
+        if (isClosed) {
+            throw new Exception("Nao pode dar comandos depois de encerrarSistema.");
+        }
+        if (snapshot.getEmpregadosSnapshot() != null){
+            this.empregados = new LinkedHashMap<>();
+            snapshot.getEmpregadosSnapshot().forEach((id, emp) -> {
+                empregados.put(id, emp.clone());
+            });
+        }
+    }
+
+    public void close(){
+        isClosed = true;
     }
 
 }

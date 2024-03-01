@@ -111,8 +111,10 @@ public class Empregado implements Serializable, Cloneable {
         try {
             Empregado clone = (Empregado) super.clone();
 
-            clone.membroSindicato = this.membroSindicato.clone();
-            clone.metodoPagamento = this.metodoPagamento.clone();
+            if (this.membroSindicato != null)
+                clone.membroSindicato = this.membroSindicato.clone();
+            if(this.metodoPagamento != null)
+                clone.metodoPagamento = this.metodoPagamento.clone();
 
             return clone;
         } catch (CloneNotSupportedException e) {

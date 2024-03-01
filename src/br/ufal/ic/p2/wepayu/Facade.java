@@ -2,9 +2,7 @@ package br.ufal.ic.p2.wepayu;
 
 import br.ufal.ic.p2.wepayu.daos.*;
 import br.ufal.ic.p2.wepayu.exceptions.TipoEmpregadoInvalidoException;
-import br.ufal.ic.p2.wepayu.services.DBManager;
-import br.ufal.ic.p2.wepayu.services.FolhaBuilder;
-import br.ufal.ic.p2.wepayu.services.Utils;
+import br.ufal.ic.p2.wepayu.services.*;
 import br.ufal.ic.p2.wepayu.models.*;
 
 public class Facade {
@@ -13,20 +11,26 @@ public class Facade {
 
     private final DaoManager daos;
     private final FolhaBuilder folha;
+    private final History history;
+
 
 
     public Facade() {
         session = DBManager.getSession();
         daos = new DaoManager(session);
         folha =  new FolhaBuilder();
+        history = new History(session.query());
+        history.push();
     }
 
     public void zerarSistema() throws Exception{
         session.clearAll();
+        history.push();
     }
 
     public void encerrarSistema() throws Exception{
         session.commit();
+        session.close();
     }
 
     public String criarEmpregado(String nome, String endereco, String tipo, String salario) throws Exception {
@@ -34,6 +38,7 @@ public class Facade {
                 endereco,
                 tipo,
                 salario);
+        history.push();
         return empregado.getId();
     }
 
@@ -43,6 +48,7 @@ public class Facade {
                 tipo,
                 salario,
                 comissao);
+        history.push();
         return empregado.getId();
     }
 
@@ -59,6 +65,7 @@ public class Facade {
                     atributo,
                     valor,
                     null);
+        history.push();
     }
 
     public void alteraEmpregado(String emp, String atributo, String valor, String comissao) throws Exception{
@@ -66,6 +73,7 @@ public class Facade {
                 atributo,
                 valor,
                 comissao);
+        history.push();
     }
 
     public void alteraEmpregado(String emp, String atributo, String valor1, String banco, String agencia, String contaCorrente) throws Exception{
@@ -74,6 +82,7 @@ public class Facade {
                 banco,
                 agencia,
                 contaCorrente);
+        history.push();
     }
 
 
@@ -88,6 +97,7 @@ public class Facade {
         Empregado empregado = daos.getEmpregadoDao().getById(emp);
 
         daos.getMembroDao().create(empregado, idSindicato, taxa);
+        history.push();
     }
 
     public String getAtributoEmpregado(String emp, String atributo) throws Exception {
@@ -100,22 +110,26 @@ public class Facade {
 
     public void removerEmpregado(String emp) throws Exception{
         daos.getEmpregadoDao().deleteById(emp);
+        history.push();
     }
 
     public void lancaCartao(String emp, String data, String horas) throws Exception {
         Empregado empregado = daos.getEmpregadoDao().getById(emp);
         daos.getCartaoDao().create(empregado, data, horas);
+        history.push();
     }
 
     public void lancaVenda(String emp, String data, String valor) throws Exception{
         Empregado empregado = daos.getEmpregadoDao().getById(emp);
         daos.getVendaDao().create(empregado, data, valor);
+        history.push();
     }
 
     public void lancaTaxaServico(String membro, String data, String valor) throws Exception
     {
         Empregado empregado = daos.getEmpregadoDao().getByIdSindicato(membro);
         daos.getTaxaDao().create(empregado, data, valor);
+        history.push();
     }
 
     public String getHorasNormaisTrabalhadas(String emp, String dataInicial, String dataFinal) throws Exception
@@ -162,6 +176,21 @@ public class Facade {
 
     public void rodaFolha(String data, String saida) throws Exception{
         folha.geraFolha(data, saida);
+        history.push();
+    }
+
+    public String getNumeroDeEmpregados(){
+        return session.size();
+    }
+
+    public void undo() throws Exception{
+        Memento m = history.getUndo();
+        session.restore(m);
+    }
+
+    public void redo() throws Exception{
+        Memento m = history.getRedo();
+        session.restore(m);
     }
 
 }
