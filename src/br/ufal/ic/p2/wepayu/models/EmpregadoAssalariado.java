@@ -50,4 +50,9 @@ public class EmpregadoAssalariado extends Empregado {
 
         return new Object[]{linha, valores};
     }
+
+    @Override
+    public EmpregadoAssalariado clone() {
+        return (EmpregadoAssalariado) super.clone();
+    }
 }

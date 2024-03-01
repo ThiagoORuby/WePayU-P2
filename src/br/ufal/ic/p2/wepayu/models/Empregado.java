@@ -5,7 +5,7 @@ import br.ufal.ic.p2.wepayu.exceptions.ValorNuloException;
 import java.io.Serializable;
 import java.util.*;
 
-public class Empregado implements Serializable{
+public class Empregado implements Serializable, Cloneable {
 
     private String id;
     private String nome;
@@ -104,5 +104,19 @@ public class Empregado implements Serializable{
 
     public void setSalario(Double salario) {
         this.salario = salario;
+    }
+
+    @Override
+    public Empregado clone() {
+        try {
+            Empregado clone = (Empregado) super.clone();
+
+            clone.membroSindicato = this.membroSindicato.clone();
+            clone.metodoPagamento = this.metodoPagamento.clone();
+
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
-public class CartaoDePonto implements Serializable {
+public class CartaoDePonto implements Serializable, Cloneable {
 
     private String data;
     private String hora;
@@ -29,5 +29,14 @@ public class CartaoDePonto implements Serializable {
 
     public void setHora(String hora) {
         this.hora = hora;
+    }
+
+    @Override
+    public CartaoDePonto clone() {
+        try {
+            return (CartaoDePonto) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

@@ -11,12 +11,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-public class MembroSindicato implements Serializable {
+public class MembroSindicato implements Serializable, Cloneable {
 
     private String idMembro;
     private Double taxaSindical;
-
-
     private List<TaxaServico> taxas;
     private HashSet<TaxaServico> taxasExtras;
 
@@ -105,4 +103,25 @@ public class MembroSindicato implements Serializable {
         return valorTotal;
     }
 
+    @Override
+    public MembroSindicato clone() {
+        try {
+            MembroSindicato clone = (MembroSindicato) super.clone();
+
+            clone.taxas = new ArrayList<>();
+            clone.taxasExtras = new HashSet<>();
+
+            for(TaxaServico taxa: taxas){
+                clone.taxas.add(taxa.clone());
+            }
+
+            for(TaxaServico taxa: taxasExtras){
+                clone.taxasExtras.add(taxa.clone());
+            }
+
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
 }

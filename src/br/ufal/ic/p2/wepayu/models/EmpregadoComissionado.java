@@ -126,5 +126,16 @@ public class EmpregadoComissionado extends Empregado {
         return new Object[]{linha, valores};
     }
 
+    @Override
+    public EmpregadoComissionado clone() {
+        EmpregadoComissionado clone = (EmpregadoComissionado) super.clone();
 
+        clone.vendas = new ArrayList<>();
+
+        for(ResultadoDeVenda venda: this.vendas){
+            clone.vendas.add(venda.clone());
+        }
+
+        return clone;
+    }
 }

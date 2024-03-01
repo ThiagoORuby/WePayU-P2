@@ -164,5 +164,16 @@ public class EmpregadoHorista extends Empregado {
         return new Object[]{linha, valores};
     }
 
+    @Override
+    public EmpregadoHorista clone() {
+        EmpregadoHorista clone = (EmpregadoHorista) super.clone();
 
+        clone.cartoes = new ArrayList<>();
+
+        for(CartaoDePonto cartao: this.cartoes){
+            clone.cartoes.add(cartao.clone());
+        }
+
+        return clone;
+    }
 }
