@@ -38,7 +38,10 @@ public class AgendaPagamento implements Serializable, Cloneable {
             }
             else {
                 int dia = Integer.parseInt(splitted[splitted.length - 1]);
-                if(dia > 7 || dia < 1)
+                if(splitted[0].equals("mensal")){
+                    if(dia > 28 || dia < 1) throw new DescricaoInvalidaException();
+                }
+                else if(dia > 7 || dia < 1)
                     throw new DescricaoInvalidaException();
                 setDia(dia);
             }

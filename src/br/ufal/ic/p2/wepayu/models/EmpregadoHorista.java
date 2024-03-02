@@ -140,7 +140,7 @@ public class EmpregadoHorista extends Empregado {
         Double desconto = getDescontos(dataInicial,data);
         if(valores.get(2) < desconto) {
             valores.add(0D);
-            String dataCobranca = Utils.getProximaSexta(data);
+            String dataCobranca = Utils.getProximoDiaDePagamento(data, getAgendaPagamento());
             setTaxaExtra(dataCobranca, desconto);
         }
         else {

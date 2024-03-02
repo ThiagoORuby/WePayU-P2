@@ -1,9 +1,6 @@
 package br.ufal.ic.p2.wepayu.services;
 
-import br.ufal.ic.p2.wepayu.models.Empregado;
-import br.ufal.ic.p2.wepayu.models.EmpregadoAssalariado;
-import br.ufal.ic.p2.wepayu.models.EmpregadoComissionado;
-import br.ufal.ic.p2.wepayu.models.EmpregadoHorista;
+import br.ufal.ic.p2.wepayu.models.*;
 
 import javax.xml.stream.XMLStreamReader;
 import java.io.*;
@@ -82,11 +79,12 @@ public class FolhaBuilder {
         // Percorre os empregados horistas e soma o total de pagamento (caso seja dia de pagamento)
         for(Map.Entry<String, Empregado> emp : session.query().entrySet()){
             Empregado e = emp.getValue();
+            AgendaPagamento agenda = e.getAgendaPagamento();
             if(e.getTipo().equals("horista"))
             {
                 String dataInicial;
-                if(!Utils.ehSexta(data)) break;
-                else dataInicial = Utils.getUltimaSexta(data);
+                if(!Utils.ehDiaDePagamento(data, agenda)) break;
+                else dataInicial = Utils.getUltimoDiaDePagamento(data, agenda);
                 Object[] dados = ((EmpregadoHorista) e).getDadosEmLinha(dataInicial, data);
                 dadosEmpregados.add((String) dados[0]);
                 somaTotal = Utils.somarListas(somaTotal,
@@ -146,11 +144,12 @@ public class FolhaBuilder {
         // Percorre os empregados assalarios e soma o total de pagamento (caso seja dia de pagamento)
         for(Map.Entry<String, Empregado> emp : session.query().entrySet()){
             Empregado e = emp.getValue();
+            AgendaPagamento agenda = e.getAgendaPagamento();
             if(e.getTipo().equals("assalariado"))
             {
                 String dataInicial;
-                if(!Utils.ehUltimoDiaMes(data)) break;
-                else dataInicial = Utils.getPrimeiroDiaMes(data);
+                if(!Utils.ehDiaDePagamento(data, agenda)) break;
+                else dataInicial = Utils.getUltimoDiaDePagamento(data, agenda);
 
                 Object[] dados = ((EmpregadoAssalariado) e).getDadosEmLinha(dataInicial, data);
                 dadosEmpregados.add((String) dados[0]);
@@ -203,11 +202,12 @@ public class FolhaBuilder {
 
         for(Map.Entry<String, Empregado> emp : session.query().entrySet()){
             Empregado e = emp.getValue();
+            AgendaPagamento agenda = e.getAgendaPagamento();
             if(e.getTipo().equals("comissionado"))
             {
                 String dataInicial;
-                if(!Utils.ehDiaDePagamentoComissionado(data)) break;
-                else dataInicial = Utils.getUltimoPagamentoComissionado(data);
+                if(!Utils.ehDiaDePagamento(data, agenda)) break;
+                else dataInicial = Utils.getUltimoDiaDePagamento(data, agenda);
                 Object[] dados = ((EmpregadoComissionado) e).getDadosEmLinha(dataInicial, data);
                 dadosEmpregados.add((String) dados[0]);
                 somaTotal = Utils.somarListas(somaTotal,

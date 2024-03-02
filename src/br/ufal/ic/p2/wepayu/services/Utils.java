@@ -10,6 +10,7 @@ import java.text.NumberFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Year;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
@@ -208,27 +209,6 @@ public class Utils {
         return (int) ChronoUnit.DAYS.between(dInicial, dFinal);
     }
 
-
-    public static String getUltimaSexta(String data) {
-        LocalDate dataParse = LocalDate.parse(data, Settings.formatter);
-        LocalDate dataInicial = dataParse.with(TemporalAdjusters.previous(DayOfWeek.FRIDAY));
-
-        return dataInicial.format(Settings.formatter);
-    }
-
-    public static String getProximaSexta(String data) {
-        LocalDate dataParse = LocalDate.parse(data, Settings.formatter);
-        LocalDate dataInicial = dataParse.with(TemporalAdjusters.next(DayOfWeek.FRIDAY));
-
-        return dataInicial.format(Settings.formatter);
-    }
-
-    public static boolean ehSexta(String data){
-        LocalDate dataParse = LocalDate.parse(data, Settings.formatter);
-
-        return dataParse.getDayOfWeek() == DayOfWeek.FRIDAY;
-    }
-
     public static boolean ehUltimoDiaMes(String data){
         LocalDate dataParse = LocalDate.parse(data, Settings.formatter);
         LocalDate ultimo = dataParse.with(TemporalAdjusters.lastDayOfMonth());
@@ -241,33 +221,6 @@ public class Utils {
 
         return dataParse.with(TemporalAdjusters.firstDayOfMonth()).
                 format(Settings.formatter);
-    }
-
-    public static boolean ehDiaDePagamentoComissionado(String data) {
-        LocalDate dataParse = LocalDate.parse(data, Settings.formatter);
-
-        // Obtém dia da semana da data
-        DayOfWeek diaDaSemana = dataParse.getDayOfWeek();
-
-        // Verifica se é sexta-feira
-        if (diaDaSemana != DayOfWeek.FRIDAY) {
-            return false;
-        }
-
-        // Calcula a data da contratação (1/1/2005)
-        LocalDate dataPrimeiroPagamento = LocalDate.of(2005, 1, 1);
-
-        // Calcula a diferença em dias entre a data e a data da contratação
-        long diferencaEmDias = ChronoUnit.DAYS.between(dataPrimeiroPagamento, dataParse);
-
-        // Verifica se a diferença em dias é um múltiplo de 14 (dias entre pagamentos)
-        return (diferencaEmDias + 1) % Settings.DIAS_ENTRE_PAGAMENTOS == 0;
-    }
-
-    public static String getUltimoPagamentoComissionado(String data) {
-        LocalDate dataParse = LocalDate.parse(data, Settings.formatter);
-        LocalDate dataInicial = dataParse.minusDays(13);
-        return dataInicial.format(Settings.formatter);
     }
 
     public static boolean ehDiaDePagamento(String data, AgendaPagamento agenda){
@@ -306,14 +259,13 @@ public class Utils {
     public static String getUltimoDiaDePagamento(String data, AgendaPagamento agenda){
         LocalDate dataParse = LocalDate.parse(data, Settings.formatter);
         LocalDate dataInicial;
+        int dia = agenda.getDia();
         if(agenda.getTipo().equals("mensal")){
-            int dia = agenda.getDia();
             if(dia == -1) {
                 return getPrimeiroDiaMes(data);
             }
             dataInicial = dataParse.minusMonths(1);
         }else{
-            int dia = agenda.getDia();
             if(agenda.getSemana() > 0){
                 int semana = agenda.getSemana();
                 dataInicial = dataParse.minusDays((semana * 7L) - 1);
@@ -322,6 +274,27 @@ public class Utils {
             }
         }
         return dataInicial.format(Settings.formatter);
+    }
+
+    public static String getProximoDiaDePagamento(String data, AgendaPagamento agenda){
+        LocalDate dataParse = LocalDate.parse(data, Settings.formatter);
+        LocalDate proximaData;
+        int dia = agenda.getDia();
+        if(agenda.getTipo().equals("mensal")){
+            if(dia == -1) {
+                proximaData = YearMonth.from(dataParse).plusMonths(1).atEndOfMonth();
+            }else{
+                proximaData = dataParse.plusMonths(1);
+            }
+        }else{
+            if(agenda.getSemana() > 0){
+                int semana = agenda.getSemana();
+                proximaData = dataParse.plusDays((semana * 7L) - 1);
+            }else{
+                proximaData = dataParse.with(TemporalAdjusters.next(DayOfWeek.of(dia)));
+            }
+        }
+        return proximaData.minusDays(1).format(Settings.formatter);
     }
 
     public static List<Double> somarListas(List<Double> lista1, List<Double> lista2) throws Exception{
