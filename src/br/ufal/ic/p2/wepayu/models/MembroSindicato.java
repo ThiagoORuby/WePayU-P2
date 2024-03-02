@@ -66,6 +66,13 @@ public class MembroSindicato implements Serializable, Cloneable {
         this.taxasExtras.add(taxaExtra);
     }
 
+    /**
+     * Retorna o valor total das taxas do sindicato em um intervalo de dias
+     * @param dataInicial data inicial
+     * @param dataFinal data final
+     * @return valor total das taxas no intervalo
+     * @throws Exception se falhar em alguma verificação
+     */
     public Double getTaxasServico(String dataInicial, String dataFinal) throws Exception{
         Double valorTotal = 0d;
 
@@ -94,6 +101,10 @@ public class MembroSindicato implements Serializable, Cloneable {
         return valorTotal;
     }
 
+    /**
+     * Retorna o total de descontos aculumados
+     * @return descontos acumulados
+     */
     public Double getTotalTaxasExtras() {
         Double valorTotal = 0d;
         for(TaxaServico taxa: taxasExtras){
@@ -102,10 +113,17 @@ public class MembroSindicato implements Serializable, Cloneable {
         return valorTotal;
     }
 
+    /**
+     * Limpa dados de descontos acumulados
+     */
     public void clearTaxasExtras(){
         taxasExtras.clear();
     }
 
+    /**
+     * Cria uma cópia do MembroSindicato
+     * @return {@link MembroSindicato} cópia
+     */
     @Override
     public MembroSindicato clone() {
         try {

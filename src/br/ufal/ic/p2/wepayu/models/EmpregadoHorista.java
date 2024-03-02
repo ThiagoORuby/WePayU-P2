@@ -43,6 +43,13 @@ public class EmpregadoHorista extends Empregado {
         }
     }
 
+    /**
+     * Retorna o total de horas normais trabalhadas em um intervalo de dias
+     * @param dataInicial data inicial
+     * @param dataFinal data final
+     * @return total de horas normais
+     * @throws Exception se falhar em alguma verficação
+     */
     public Double getHorasNormaisTrabalhadas(String dataInicial, String dataFinal) throws Exception{
         Double horas = 0d;
 
@@ -73,6 +80,13 @@ public class EmpregadoHorista extends Empregado {
         return horas;
     }
 
+    /**
+     * Retorna total de horas extras (excendentes) trabalhas em um intervalo de dias
+     * @param dataInicial data inicial
+     * @param dataFinal data final
+     * @return total de horas extras
+     * @throws Exception se falhar em alguma verificação
+     */
     public Double getHorasExtrasTrabalhadas(String dataInicial, String dataFinal) throws Exception{
 
         Double horas = 0d;
@@ -105,7 +119,13 @@ public class EmpregadoHorista extends Empregado {
         return horas;
     }
 
-
+    /**
+     * Retorna os descontos do sindicato se for sindicalizado em um intervalo de dias
+     * @param dataInicial data inicial
+     * @param dataFinal data final
+     * @return valor total de desconto no intervalo
+     * @throws Exception se falhar em alguma verficação
+     */
     public Double getDescontos(String dataInicial, String dataFinal) throws Exception{
         Double total = 0d;
 
@@ -120,6 +140,13 @@ public class EmpregadoHorista extends Empregado {
         return total;
     }
 
+    /**
+     * Retorna o salário bruto em um intervalo de dias
+     * @param dataInicial data inicial
+     * @param dataFinal data final
+     * @return valor do salário bruto
+     * @throws Exception se falhar em alguma verificação
+     */
     public Double getSalarioBruto(String dataInicial, String dataFinal) throws Exception{
         Double horasNormais = getHorasNormaisTrabalhadas(dataInicial, dataFinal);
         Double horasExtras = getHorasExtrasTrabalhadas(dataInicial, dataFinal);
@@ -127,6 +154,14 @@ public class EmpregadoHorista extends Empregado {
         return horasNormais*getSalario() + horasExtras*1.5*getSalario();
     }
 
+    /**
+     * Retorna os dados em linha para impressão na folha de pagamento
+     * acompanhado dos valores númericos (em um intervalo de dias)
+     * @param dataInicial data inicial
+     * @param data data final
+     * @return {@link Object} (String da linha, valores numéricos)
+     * @throws Exception se falhar em alguma verificação
+     */
     public Object[] getDadosEmLinha(String dataInicial, String data) throws Exception{
 
         List<Double> valores = new ArrayList<>();

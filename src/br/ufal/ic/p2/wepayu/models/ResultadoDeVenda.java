@@ -29,6 +29,10 @@ public class ResultadoDeVenda implements Serializable, Cloneable {
         this.data = data;
     }
 
+    /**
+     * Cria uma cópia do Resultado de Venda
+     * @return {@link ResultadoDeVenda} cópia
+     */
     @Override
     public ResultadoDeVenda clone() {
         try {

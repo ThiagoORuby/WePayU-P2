@@ -31,6 +31,10 @@ public class CartaoDePonto implements Serializable, Cloneable {
         this.hora = hora;
     }
 
+    /**
+     * Cria uma cópia do Cartão de Ponto
+     * @return {@link CartaoDePonto} cópia
+     */
     @Override
     public CartaoDePonto clone() {
         try {

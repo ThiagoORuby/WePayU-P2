@@ -46,6 +46,10 @@ public class MetodoPagamento implements Serializable, Cloneable {
         this.agencia = agencia;
     }
 
+    /**
+     * Cria uma cópia do Método de Pagamento
+     * @return {@link MetodoPagamento} cópia
+     */
     @Override
     public MetodoPagamento clone() {
         try {

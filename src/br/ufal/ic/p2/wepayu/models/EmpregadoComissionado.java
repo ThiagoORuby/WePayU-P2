@@ -43,6 +43,13 @@ public class EmpregadoComissionado extends Empregado {
         this.vendas.add(venda);
     }
 
+    /**
+     * Retorna o valor total de vendas realizadas em um intervalo de dias
+     * @param dataInicial data inicial
+     * @param dataFinal data final
+     * @return valor total de vendas realizadas
+     * @throws Exception se falhar em alguma verificação
+     */
     public Double getVendasRealizadas(String dataInicial, String dataFinal) throws Exception
     {
         Double valorTotal = 0d;
@@ -73,6 +80,13 @@ public class EmpregadoComissionado extends Empregado {
         return valorTotal;
     }
 
+    /**
+     * Retorna os descontos do sindicato se for sindicalizado em um intervalo de dias
+     * @param dataInicial data inicial
+     * @param dataFinal data final
+     * @return valor total de desconto no intervalo
+     * @throws Exception se falhar em alguma verficação
+     */
     public Double getDescontos(String dataInicial, String dataFinal) throws Exception{
         Double total = 0d;
 
@@ -87,6 +101,10 @@ public class EmpregadoComissionado extends Empregado {
         return total;
     }
 
+    /**
+     * Retorna salário fixo com base na agenda de pagamento
+     * @return salário fixo do comissionado
+     */
     public Double getSalarioFixo(){
         AgendaPagamento agenda = getAgendaPagamento();
 
@@ -98,15 +116,37 @@ public class EmpregadoComissionado extends Empregado {
         }
     }
 
+    /**
+     * Retorna valor total das comissões em um intervalo de dias
+     * @param dataInicial data inicial
+     * @param dataFinal data final
+     * @return valor total das comissões
+     * @throws Exception se falhar em alguma verificação
+     */
     public Double getComissoes(String dataInicial, String dataFinal) throws Exception{
         Double percentual = getVendasRealizadas(dataInicial, dataFinal) * getComissao();
         return Math.floor(percentual*100)/100F;
     }
 
+    /**
+     * Retorna o salário bruto em um intervalo de dias
+     * @param dataInicial data inicial
+     * @param dataFinal data final
+     * @return valor do salário bruto
+     * @throws Exception se falhar em alguma verificação
+     */
     public Double getSalarioBruto(String dataInicial, String dataFinal) throws Exception{
         return  getSalarioFixo() + getComissoes(dataInicial, dataFinal);
     }
 
+    /**
+     * Retorna os dados em linha para impressão na folha de pagamento
+     * acompanhado dos valores númericos (em um intervalo de dias)
+     * @param dataInicial data inicial
+     * @param data data final
+     * @return {@link Object} (String da linha, valores numéricos)
+     * @throws Exception se falhar em alguma verificação
+     */
     public Object[] getDadosEmLinha(String dataInicial, String data) throws Exception{
 
         List<Double> valores = new ArrayList<>();

@@ -14,6 +14,13 @@ public class EmpregadoAssalariado extends Empregado {
         setAgendaPagamento(new AgendaPagamento("mensal $"));
     }
 
+    /**
+     * Retorna os descontos do sindicato se for sindicalizado em um intervalo de dias
+     * @param dataInicial data inicial
+     * @param dataFinal data final
+     * @return valor total de desconto no intervalo
+     * @throws Exception se falhar em alguma verficação
+     */
     public Double getDescontos(String dataInicial, String dataFinal) throws Exception{
         Double total = 0d;
 
@@ -27,7 +34,11 @@ public class EmpregadoAssalariado extends Empregado {
         return total;
     }
 
-    public Double getSalarioBruto() throws Exception{
+    /**
+     * Retorna o salário bruto com base na agenda de pagamento
+     * @return sálario bruto
+     */
+    public Double getSalarioBruto() {
         if(getAgendaPagamento().getTipo().equals("mensal")){
             return getSalario();
         }
@@ -38,10 +49,25 @@ public class EmpregadoAssalariado extends Empregado {
         }
     }
 
+    /**
+     * Retorna o salário líquido em um intervalo de dias
+     * @param dataInicial data inicial
+     * @param dataFinal data final
+     * @return salário líquido no intervalo
+     * @throws Exception se falhar em alguma verificação
+     */
     public Double getSalarioLiquido(String dataInicial, String dataFinal) throws Exception{
         return getSalario() - getDescontos(dataInicial, dataFinal);
     }
 
+    /**
+     * Retorna os dados em linha para impressão na folha de pagamento
+     * acompanhado dos valores númericos (em um intervalo de dias)
+     * @param dataInicial data inicial
+     * @param data data final
+     * @return {@link Object} (String da linha, valores numéricos)
+     * @throws Exception se falhar em alguma verificação
+     */
     public Object[] getDadosEmLinha(String dataInicial, String data) throws Exception{
 
         List<Double> valores = new ArrayList<>();

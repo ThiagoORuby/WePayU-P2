@@ -46,14 +46,14 @@ public class Empregado implements Serializable, Cloneable {
         this.id = id;
     }
 
-    public void setNome(String nome) throws Exception {
+    public void setNome(String nome) throws ValorNuloException {
         if(nome.isEmpty()){
             throw new ValorNuloException("Nome", "o");
         }
         this.nome = nome;
     }
 
-    public void setEndereco(String endereco) throws Exception {
+    public void setEndereco(String endereco) throws ValorNuloException {
         if(endereco.isEmpty()) {
             throw new ValorNuloException("Endereco", "o");
         }
@@ -88,6 +88,10 @@ public class Empregado implements Serializable, Cloneable {
         this.metodoPagamento = metodoPagamento;
     }
 
+    /**
+     * Retorna o método de pagamento em formato de string
+     * @return String com dados do pagmento
+     */
     public String getDadosPagamento(){
         MetodoPagamento metodo = getMetodoPagamento();
 
@@ -120,6 +124,10 @@ public class Empregado implements Serializable, Cloneable {
         this.agendaPagamento = new AgendaPagamento(descricao);
     }
 
+    /**
+     * Cria uma cópia do empregado
+     * @return {@link Empregado} cópia
+     */
     @Override
     public Empregado clone() {
         try {

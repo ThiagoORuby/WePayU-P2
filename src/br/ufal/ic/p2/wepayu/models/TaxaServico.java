@@ -29,6 +29,10 @@ public class TaxaServico implements Serializable, Cloneable {
         this.valor = valor;
     }
 
+    /**
+     * Cria uma cópia da Taxa de Serviço
+     * @return {@link TaxaServico} cópia
+     */
     @Override
     public TaxaServico clone() {
         try {
