@@ -17,19 +17,23 @@ public class Facade {
 
 
     public Facade() {
+        // inicializa instâncias base do sistema
         session = DBManager.getSession();
         daos = new DaoManager(session);
         folha =  new FolhaBuilder();
         history = new History(session.query());
+        // Adiciona estado inicial a pilha do histórico
         history.push();
     }
 
     public void zerarSistema() throws Exception{
+        // limpa as informações locais e do XML
         session.clearAll();
         history.push();
     }
 
     public void encerrarSistema() throws Exception{
+        // Salva as informações no xml
         session.commit();
         session.commitAgendas();
         session.close();
@@ -56,11 +60,13 @@ public class Facade {
 
     public void alteraEmpregado(String emp, String atributo, String valor) throws Exception
     {
+        // Verifica se a descrição da agenda existe na base de dados
         if(atributo.equals("agendaPagamento")){
             if(!daos.getAgendaDao().find(valor))
                 throw new AgendaIndisponivelException();
         }
 
+        // Chama o método corresponte para alteração do empregado com base no atributo
         if(atributo.equals("metodoPagamento")) {
             daos.getEmpregadoDao().updatePagamentoEmpregado(emp,
                     valor,
@@ -95,6 +101,7 @@ public class Facade {
 
 
     public void alteraEmpregado(String emp, String atributo, String valor, String idSindicato, String taxaSindical) throws Exception{
+
         if(!atributo.equals("sindicalizado")) return;
 
         idSindicato = Utils.validarAtributo(idSindicato, "Identificacao do sindicato", "a");

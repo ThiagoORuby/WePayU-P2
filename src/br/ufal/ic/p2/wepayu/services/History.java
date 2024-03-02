@@ -28,7 +28,7 @@ public class History {
     }
 
     /**
-     * Adiciona um estado {@link Memento} a pilha de Undo
+     * Adiciona um estado {@link Memento} a pilha de Undo do histórico
      */
     public void push(){
         Memento m = new Memento(currentEmpregados);
