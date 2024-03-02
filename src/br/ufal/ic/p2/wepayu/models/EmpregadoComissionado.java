@@ -88,7 +88,14 @@ public class EmpregadoComissionado extends Empregado {
     }
 
     public Double getSalarioFixo(){
-        return Math.floor((getSalario()*12D/52D)*2D * 100)/100F;
+        AgendaPagamento agenda = getAgendaPagamento();
+
+        if(agenda.getTipo().equals("mensal"))
+            return getSalario();
+        else{
+            int semana = Math.max(agenda.getSemana(), 1);
+            return Math.floor((getSalario()*12D/52D)*semana * 100)/100F;
+        }
     }
 
     public Double getComissoes(String dataInicial, String dataFinal) throws Exception{

@@ -27,6 +27,17 @@ public class EmpregadoAssalariado extends Empregado {
         return total;
     }
 
+    public Double getSalarioBruto() throws Exception{
+        if(getAgendaPagamento().getTipo().equals("mensal")){
+            return getSalario();
+        }
+        else{
+            int semana = getAgendaPagamento().getSemana();
+            if (semana == 0) semana = 1;
+            return Math.floor(((getSalario()*12D/52D)*semana)*100)/100F;
+        }
+    }
+
     public Double getSalarioLiquido(String dataInicial, String dataFinal) throws Exception{
         return getSalario() - getDescontos(dataInicial, dataFinal);
     }

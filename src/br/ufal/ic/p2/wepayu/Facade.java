@@ -200,7 +200,7 @@ public class Facade {
         session.restore(m);
     }
 
-    public void criaAgendaPagamento(String descricao) throws Exception{
+    public void criarAgendaDePagamentos(String descricao) throws Exception{
         daos.getAgendaDao().create(descricao);
     }
 }

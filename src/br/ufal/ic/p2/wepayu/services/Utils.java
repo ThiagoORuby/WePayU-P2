@@ -270,6 +270,60 @@ public class Utils {
         return dataInicial.format(Settings.formatter);
     }
 
+    public static boolean ehDiaDePagamento(String data, AgendaPagamento agenda){
+        LocalDate dataParse = LocalDate.parse(data, Settings.formatter);
+        // Obtém dia da semana da data
+        DayOfWeek diaDaSemana = dataParse.getDayOfWeek();
+
+        if(agenda.getTipo().equals("mensal")){
+            // mensalmente
+            int dia = agenda.getDia();
+            if(dia == -1){
+                return ehUltimoDiaMes(data);
+            }
+            else if(diaDaSemana == DayOfWeek.of(dia)) return true;
+        }
+        else{
+            int dia = agenda.getDia();
+            if(agenda.getSemana() > 0){
+                // a cada x semanas
+
+                // Calcula a data da contratação (1/1/2005)
+                LocalDate dataContratacao = LocalDate.of(2005, 1, 1);
+
+                long diferencaEmDias = ChronoUnit.DAYS.between(dataContratacao, dataParse) + 1;
+
+                return diferencaEmDias % agenda.getSemana()*7 == 0;
+            }
+            else{
+                // toda semana
+                if(diaDaSemana == DayOfWeek.of(dia)) return true;
+            }
+        }
+        return false;
+    }
+
+    public static String getUltimoDiaDePagamento(String data, AgendaPagamento agenda){
+        LocalDate dataParse = LocalDate.parse(data, Settings.formatter);
+        LocalDate dataInicial;
+        if(agenda.getTipo().equals("mensal")){
+            int dia = agenda.getDia();
+            if(dia == -1) {
+                return getPrimeiroDiaMes(data);
+            }
+            dataInicial = dataParse.minusMonths(1);
+        }else{
+            int dia = agenda.getDia();
+            if(agenda.getSemana() > 0){
+                int semana = agenda.getSemana();
+                dataInicial = dataParse.minusDays((semana * 7L) - 1);
+            }else{
+                dataInicial = dataParse.with(TemporalAdjusters.previous(DayOfWeek.of(dia)));
+            }
+        }
+        return dataInicial.format(Settings.formatter);
+    }
+
     public static List<Double> somarListas(List<Double> lista1, List<Double> lista2) throws Exception{
         if(lista1.isEmpty()) return lista2;
         if(lista2.isEmpty()) return lista1;

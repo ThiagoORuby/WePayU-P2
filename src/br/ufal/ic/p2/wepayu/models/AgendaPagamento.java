@@ -17,7 +17,7 @@ public class AgendaPagamento implements Serializable, Cloneable {
     public AgendaPagamento(String descricao) throws Exception{
         setDescricao(descricao);
         String[] splitted = descricao.split("\\s+");
-
+        // TODO; Melhorar codigo (conversao pra inteiro, checagem de erro)
         if(splitted.length >= 1){
             String tipo = splitted[0];
             if(!Arrays.asList(Settings.TIPOS_AGENDAS).contains(tipo))

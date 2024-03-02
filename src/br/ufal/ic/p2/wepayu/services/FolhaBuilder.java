@@ -44,22 +44,23 @@ public class FolhaBuilder {
             {
                 case "horista" -> {
                     // Checa se é sexta e pega a ultima sexta para calcular o salario dos horistas
-                    if(Utils.ehSexta(data)){
-                        String dataInicial = Utils.getUltimaSexta(data);
+                    if(Utils.ehDiaDePagamento(data, e.getAgendaPagamento())){
+                        String dataInicial = Utils.getUltimoDiaDePagamento(data, e.getAgendaPagamento());
                         total += ((EmpregadoHorista) e).getSalarioBruto(dataInicial, data);
                     }
                 }
                 case "assalariado" -> {
                     // Checa se é o ultimo dia do mes para calcular o salario dos assalariados
-                    if(Utils.ehUltimoDiaMes(data)){
-                        total += e.getSalario();
+                    if(Utils.ehDiaDePagamento(data, e.getAgendaPagamento())){
+                        // todo: atualizar com base na agenda de pagamento
+                        total += ((EmpregadoAssalariado)e).getSalarioBruto();
                     }
                 }
                 case "comissionado" -> {
                     // Checha se está no escopo de a cada 2 sextas, pega o ultimo dia de pagamento e
                     // calcula o salario dos comissionados
-                    if(Utils.ehDiaDePagamentoComissionado(data)){
-                        String dataInicial = Utils.getUltimoPagamentoComissionado(data);
+                    if(Utils.ehDiaDePagamento(data, e.getAgendaPagamento())){
+                        String dataInicial = Utils.getUltimoDiaDePagamento(data, e.getAgendaPagamento());
                         total += ((EmpregadoComissionado) e).getSalarioBruto(dataInicial, data);
                     }
                 }
