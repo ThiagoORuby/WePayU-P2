@@ -7,6 +7,7 @@ import java.util.Arrays;
 
 public class AgendaPagamento implements Serializable, Cloneable {
 
+    private String descricao;
     private String tipo;
     private int semana;
     private int dia;
@@ -14,6 +15,7 @@ public class AgendaPagamento implements Serializable, Cloneable {
     public AgendaPagamento(){}
 
     public AgendaPagamento(String descricao) throws Exception{
+        setDescricao(descricao);
         String[] splitted = descricao.split("\\s+");
 
         if(splitted.length >= 1){
@@ -48,6 +50,14 @@ public class AgendaPagamento implements Serializable, Cloneable {
         setDia(dia);
     }
 
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
+    }
+
     public String getTipo() {
         return tipo;
     }
@@ -70,6 +80,11 @@ public class AgendaPagamento implements Serializable, Cloneable {
 
     public void setDia(int dia) {
         this.dia = dia;
+    }
+
+    @Override
+    public String toString() {
+        return descricao;
     }
 
     @Override

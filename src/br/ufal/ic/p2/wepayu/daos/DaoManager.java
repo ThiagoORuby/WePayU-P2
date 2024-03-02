@@ -15,8 +15,8 @@ public class DaoManager {
     private CartaoDao cartaoDao;
     private TaxaDao taxaDao;
     private VendaDao vendaDao;
-
     private MembroDao membroDao;
+    private AgendaDao agendaDao;
 
 
     public DaoManager(DBManager session){
@@ -56,6 +56,13 @@ public class DaoManager {
             membroDao = new MembroDao(session);
         }
         return membroDao;
+    }
+
+    public AgendaDao getAgendaDao(){
+        if(agendaDao == null){
+            agendaDao = new AgendaDao(session);
+        }
+        return agendaDao;
     }
 
 

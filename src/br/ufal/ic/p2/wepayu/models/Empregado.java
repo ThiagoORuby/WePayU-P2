@@ -116,6 +116,10 @@ public class Empregado implements Serializable, Cloneable {
         this.agendaPagamento = agendaPagamento;
     }
 
+    public void setAgendaPagamento(String descricao) throws Exception{
+        this.agendaPagamento = new AgendaPagamento(descricao);
+    }
+
     @Override
     public Empregado clone() {
         try {

@@ -83,6 +83,7 @@ public class DBManager {
     private void restoreAgendas(){
         try{
             agendas = Utils.getAgendasPadrao();
+            commitAgendas();
         }catch (Exception e){
             System.out.println("Erro ou restaurar a agenda");
         }

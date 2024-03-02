@@ -123,6 +123,7 @@ public class EmpregadoDao{
             case "idSindicato" -> empregado.getMembroSindicato().getIdMembro();
             case "taxaSindical" -> Utils.doubleToString(empregado.getMembroSindicato().getTaxaSindical(),
                     false);
+            case "agendaPagamento" -> empregado.getAgendaPagamento().toString();
             default -> throw new AtributoNaoExisteException();
         };
     }
@@ -132,7 +133,6 @@ public class EmpregadoDao{
         Empregado empregado = getById(id);
 
         Utils.checarAtributo(empregado, atributo);
-
 
         switch (atributo) {
             case "nome" -> empregado.setNome(valor);
@@ -145,6 +145,7 @@ public class EmpregadoDao{
             case "salario" -> empregado.setSalario(Utils.formatarValor(valor, "Salario", "o"));
             case "comissao" -> ((EmpregadoComissionado) empregado).setComissao(
                     Utils.formatarValor(valor, "Comissao", "a"));
+            case "agendaPagamento" -> empregado.setAgendaPagamento(valor);
             default -> throw new AtributoNaoExisteException();
         }
         session.commit();

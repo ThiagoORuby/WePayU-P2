@@ -11,15 +11,14 @@ public class AgendaDao {
         this.session = session;
     }
     public void create(String descricao) throws Exception {
-        AgendaPagamento agenda = new AgendaPagamento(descricao);
-        if(find(agenda)) throw new Exception("Agenda ja existe.");
-        session.addAgenda(agenda);
+        if(find(descricao)) throw new Exception("Agenda de pagamentos ja existe");
+        session.addAgenda(new AgendaPagamento(descricao));
         //session.commitAgendas();
     }
 
-    public boolean find(AgendaPagamento agenda){
+    public boolean find(String descricao){
         for(AgendaPagamento ag: session.queryAgendas()){
-            if(ag.equals(agenda)) return true;
+            if(ag.toString().equals(descricao)) return true;
         }
         return false;
     }

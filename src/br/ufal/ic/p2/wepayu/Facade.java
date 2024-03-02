@@ -30,6 +30,7 @@ public class Facade {
 
     public void encerrarSistema() throws Exception{
         session.commit();
+        session.commitAgendas();
         session.close();
     }
 
@@ -54,17 +55,23 @@ public class Facade {
 
     public void alteraEmpregado(String emp, String atributo, String valor) throws Exception
     {
-        if(atributo.equals("metodoPagamento"))
+        if(atributo.equals("agendaPagamento")){
+            if(!daos.getAgendaDao().find(valor))
+                throw new Exception("Agenda de pagamento nao esta disponivel");
+        }
+
+        if(atributo.equals("metodoPagamento")) {
             daos.getEmpregadoDao().updatePagamentoEmpregado(emp,
                     valor,
                     null,
                     null,
                     null);
-        else
+        }else {
             daos.getEmpregadoDao().updateAtributoById(emp,
                     atributo,
                     valor,
                     null);
+        }
         history.push();
     }
 
@@ -193,4 +200,7 @@ public class Facade {
         session.restore(m);
     }
 
+    public void criaAgendaPagamento(String descricao) throws Exception{
+        daos.getAgendaDao().create(descricao);
+    }
 }
