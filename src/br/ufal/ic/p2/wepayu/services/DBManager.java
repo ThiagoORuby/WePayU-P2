@@ -24,7 +24,9 @@ public class DBManager {
     private LinkedHashMap<String, Empregado> empregados;
     private List<AgendaPagamento> agendas;
 
-
+    /**
+     * Cria um {@link DBManager} e inicializa os dados da base
+     */
     private DBManager() {
         this.empregados = getAllData();
         this.isClosed = false;
@@ -44,7 +46,7 @@ public class DBManager {
     }
 
     /**
-     * Limpa o conteúdo do banco de dados
+     * Limpa o conteúdo do banco de dados e restaura lista de agendas
      */
     public void clearAll() {
         empregados.clear();
@@ -58,6 +60,10 @@ public class DBManager {
         isClosed = false;
     }
 
+    /**
+     * Retorna a lista de agendas de pagamento salvos no XML
+     * @return lista de {@link AgendaPagamento}
+     */
     private List<AgendaPagamento> getAllAgendas() {
         List<AgendaPagamento> agendas = new ArrayList<>();
 
@@ -81,6 +87,9 @@ public class DBManager {
         return agendas;
     }
 
+    /**
+     * Restaura lista de agendas com base nas opções padrão
+     */
     private void restoreAgendas(){
         try{
             agendas = Utils.getAgendasPadrao();
@@ -92,7 +101,7 @@ public class DBManager {
 
     /**
      * Retorna o LinkedHashMap com dados dos empregados salvos no XML
-     * @return LinkedHashMap dos empregados
+     * @return LinkedHashMap de {@link Empregado}
      */
     private LinkedHashMap<String, Empregado> getAllData() {
         LinkedHashMap<String, Empregado> empregados = new LinkedHashMap<>();
@@ -117,18 +126,22 @@ public class DBManager {
 
     /**
      * Retorna o atributo empregados
-     * @return LinkedHashMap dos empregados
+     * @return LinkedHashMap de {@link Empregado}
      */
     public LinkedHashMap<String, Empregado> query() {
         return empregados;
     }
 
+    /**
+     * Retorna o atributo agendas
+     * @return lista de {@link AgendaPagamento}
+     */
     public List<AgendaPagamento> queryAgendas(){
         return agendas;
     }
 
     /**
-     * Salva os dados de empregados no XML
+     * Salva os dados de empregados em XML
      */
     public void commit() {
         try (BufferedOutputStream file = new BufferedOutputStream(
@@ -143,6 +156,9 @@ public class DBManager {
         }
     }
 
+    /**
+     * Salva os dados de agendas em XML
+     */
     public void commitAgendas(){
         try (BufferedOutputStream file = new BufferedOutputStream(
                 new FileOutputStream(Settings.AGENDA_PATH))) {
@@ -164,6 +180,10 @@ public class DBManager {
         empregados.put(empregado.getId(), empregado);
     }
 
+    /**
+     * Adiciona uma nova agenda de pagamento
+     * @param agenda {@link AgendaPagamento} a ser adicionada
+     */
     public void addAgenda(AgendaPagamento agenda){
         agendas.add(agenda);
     }
@@ -177,11 +197,20 @@ public class DBManager {
         empregados.put(id, empregado);
     }
 
+    /**
+     * Retorna o tamanho da base de dados de empregados
+     * @return tamanho de empregados
+     */
     public String size(){
         return String.valueOf(this.empregados.size());
     }
 
-    public void restore(Memento snapshot) throws Exception {
+    /**
+     * Restaura os dados de empregados para um determinado estado
+     * @param snapshot {@link Memento} que armazena um estado dos dados
+     * @throws SistemaEncerradoException se o acesso a base foi fechado
+     */
+    public void restore(Memento snapshot) throws SistemaEncerradoException {
 
         if (isClosed) {
             throw new SistemaEncerradoException();
@@ -194,6 +223,9 @@ public class DBManager {
         }
     }
 
+    /**
+     * Fecha o acesso a base de dados
+     */
     public void close(){
         isClosed = true;
     }

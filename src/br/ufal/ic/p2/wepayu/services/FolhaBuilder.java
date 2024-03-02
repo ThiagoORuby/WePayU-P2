@@ -72,7 +72,6 @@ public class FolhaBuilder {
      * @throws Exception
      */
     private void geraDadosHoristas(String data) throws Exception{
-        // Lê arquivo horista.txt
         SortedSet<String> dadosEmpregados = new TreeSet<>();
         List<Double> somaTotal = Arrays.asList(0D, 0D, 0D, 0D, 0D);
 
@@ -92,7 +91,7 @@ public class FolhaBuilder {
             }
         }
 
-
+        // Lê arquivo horista.txt
         try{
             BufferedReader reader = new BufferedReader(new FileReader(Settings.HEADER_HORISTAS));
             BufferedWriter writer = new BufferedWriter(new FileWriter(saida, true));
@@ -137,7 +136,6 @@ public class FolhaBuilder {
      * @throws Exception
      */
     private void geraDadosAssalariados(String data) throws Exception{
-        // Lê arquivo assalariados.txt
         SortedSet<String> dadosEmpregados = new TreeSet<>();
         List<Double> somaTotal = Arrays.asList(0D, 0D, 0D);
 
@@ -158,6 +156,7 @@ public class FolhaBuilder {
             }
         }
 
+        // Lê arquivo assalariados.txt
         try{
             BufferedReader reader = new BufferedReader(new FileReader(Settings.HEADER_ASSALARIADOS));
             BufferedWriter writer = new BufferedWriter(new FileWriter(saida, true));
@@ -196,10 +195,16 @@ public class FolhaBuilder {
 
     }
 
+    /**
+     * Gera os dados de pagamento dos comissionados no txt correspondente
+     * @param data Data da folha de pagamento
+     * @throws Exception
+     */
     private void geraDadosComissionados(String data) throws Exception{
         SortedSet<String> dadosEmpregados = new TreeSet<>();
         List<Double> somaTotal = Arrays.asList(0D,0D,0D,0D,0D,0D);
 
+        // Percorre os empregados comissionados e soma o total de pagamento (caso seja dia de pagamento)
         for(Map.Entry<String, Empregado> emp : session.query().entrySet()){
             Empregado e = emp.getValue();
             AgendaPagamento agenda = e.getAgendaPagamento();
@@ -215,10 +220,12 @@ public class FolhaBuilder {
             }
         }
 
+        // Lê arquivo comissionado.txt
         try{
             BufferedReader reader = new BufferedReader(new FileReader(Settings.HEADER_COMISSIONADOS));
             BufferedWriter writer = new BufferedWriter(new FileWriter(saida, true));
 
+            // Escreve header dos comissionados
             String linha;
             while((linha = reader.readLine()) != null)
             {
@@ -228,11 +235,13 @@ public class FolhaBuilder {
 
             reader.close();
 
+            // Escreve os dados de cada assalariado em ordem alfabetica
             for(String dado: dadosEmpregados){
                 writer.write(dado);
                 writer.newLine();
             }
 
+            // Escreve o valor total de pagamento dos comissionados
             String total = String.format("\n%-21s %8s %8s %8s %13s %9s %15s\n", "TOTAL COMISSIONADOS",
                     Utils.doubleToString(somaTotal.get(0), false),
                     Utils.doubleToString(somaTotal.get(1), false),

@@ -97,9 +97,7 @@ public class Utils {
             else{
                 if(dia > 31) throw new DataInvalidaException();
             }
-
         }
-
         return data;
     }
 
@@ -165,20 +163,40 @@ public class Utils {
         return atributo;
     }
 
-    public static String validarAtributo(String atributo, String nome, String sufix) throws Exception{
+    /**
+     * Valida nulidade de um atributo
+     * @param atributo valor do atributo
+     * @param nome nome do atributo
+     * @param sufix sufixo de desinência de genero
+     * @return o atributo, se não for nulo
+     * @throws ValorNuloException se o atributo for nulo
+     */
+    public static String validarAtributo(String atributo, String nome, String sufix) throws ValorNuloException {
         if(atributo != null)
             if(atributo.isEmpty()) throw new ValorNuloException(nome, sufix);
 
         return atributo;
     }
 
-    public static String validarHoras(String horas) throws Exception{
+    /**
+     * Verifica se as horas não são negativas
+     * @param horas valor das horas
+     * @return horas, se não forem negativas
+     * @throws HorasNegativasException se as horas forem negativas
+     */
+    public static String validarHoras(String horas) throws HorasNegativasException {
         if(Double.parseDouble(horas.replace(",", ".")) <= 0){
             throw new HorasNegativasException();
         }
         return horas;
     }
 
+    /**
+     * Verifica se um valor é valido e não negativo e converte para {@link Double}
+     * @param valor valor a ser verificado
+     * @return valor convertido
+     * @throws Exception se falhar nas verificações
+     */
     public static Double validarValor(String valor) throws Exception{
         valor = validarAtributo(valor, "Taxa sindical", "a");
         Double valorConvertido = Double.parseDouble(valor.replace(",", "."));
@@ -189,6 +207,11 @@ public class Utils {
         return valorConvertido;
     }
 
+    /**
+     * Verifica se um tipo é valido ou aplicável
+     * @param tipo tipo a ser verificado
+     * @throws Exception se falhar na verificação
+     */
     public static void checarTipo(String tipo) throws Exception {
         if(!Settings.TIPOS.contains(tipo)){
             throw  new TipoInvalidoException();
@@ -196,12 +219,24 @@ public class Utils {
         throw new TipoNaoAplicavelException();
     }
 
-    public static void checarTipo(String tipo, String comparador) throws Exception {
+    /**
+     * Verifica se o tipo de um empregado é corresponde
+     * @param tipo tipo a ser comparado
+     * @param comparador tipo comparador
+     * @throws TipoEmpregadoInvalidoException se os tipos forem diferentes
+     */
+    public static void checarTipo(String tipo, String comparador) throws TipoEmpregadoInvalidoException {
         if(!tipo.equals(comparador))
             throw new TipoEmpregadoInvalidoException(comparador);
 
     }
 
+    /**
+     * Retorna o total de dias entre duas datas
+     * @param dataInicial data inicial
+     * @param dataFinal data final
+     * @return diferença entre as datas
+     */
     public static int getDias(String dataInicial, String dataFinal){
         LocalDate dInicial = LocalDate.parse(dataInicial, Settings.formatter);
         LocalDate dFinal = LocalDate.parse(dataFinal, Settings.formatter);
@@ -209,6 +244,11 @@ public class Utils {
         return (int) ChronoUnit.DAYS.between(dInicial, dFinal);
     }
 
+    /**
+     * Verifica se uma data é o último dia do seu mês correspondente
+     * @param data data a ser comparada
+     * @return true, se for último dia do mês, false, c.c.
+     */
     public static boolean ehUltimoDiaMes(String data){
         LocalDate dataParse = LocalDate.parse(data, Settings.formatter);
         LocalDate ultimo = dataParse.with(TemporalAdjusters.lastDayOfMonth());
@@ -216,6 +256,12 @@ public class Utils {
         return ultimo.equals(dataParse);
     }
 
+
+    /**
+     * Retorna o primeiro dia do mẽs
+     * @param data data utilizada
+     * @return primeiro dia do mês equivalente a data
+     */
     public static String getPrimeiroDiaMes(String data){
         LocalDate dataParse = LocalDate.parse(data, Settings.formatter);
 
@@ -223,6 +269,12 @@ public class Utils {
                 format(Settings.formatter);
     }
 
+    /**
+     * Verifica se é dia de pagamento com base na agenda do empregado
+     * @param data data a ser verificada
+     * @param agenda {@link AgendaPagamento} utilizada
+     * @return true, se for dia de pagamento, false, c.c.
+     */
     public static boolean ehDiaDePagamento(String data, AgendaPagamento agenda){
         LocalDate dataParse = LocalDate.parse(data, Settings.formatter);
         // Obtém dia da semana da data
@@ -234,7 +286,7 @@ public class Utils {
             if(dia == -1){
                 return ehUltimoDiaMes(data);
             }
-            else if(dataParse.getDayOfMonth() == dia) return true;
+            else return dataParse.getDayOfMonth() == dia;
         }
         else{
             int dia = agenda.getDia();
@@ -256,6 +308,12 @@ public class Utils {
         return false;
     }
 
+    /**
+     * Retorna o último dia em que o empregado foi pago com base na agenda
+     * @param data data utilizada
+     * @param agenda {@link AgendaPagamento} utilizada
+     * @return último dia em que houve pagamento
+     */
     public static String getUltimoDiaDePagamento(String data, AgendaPagamento agenda){
         LocalDate dataParse = LocalDate.parse(data, Settings.formatter);
         LocalDate dataInicial;
@@ -276,6 +334,12 @@ public class Utils {
         return dataInicial.format(Settings.formatter);
     }
 
+    /**
+     * Retorna o próximo dia de pagamento de um empregado com base na agenda
+     * @param data data utilizada
+     * @param agenda {@link AgendaPagamento} utilizada
+     * @return data do próximo pagamento
+     */
     public static String getProximoDiaDePagamento(String data, AgendaPagamento agenda){
         LocalDate dataParse = LocalDate.parse(data, Settings.formatter);
         LocalDate proximaData;
@@ -297,7 +361,14 @@ public class Utils {
         return proximaData.minusDays(1).format(Settings.formatter);
     }
 
-    public static List<Double> somarListas(List<Double> lista1, List<Double> lista2) throws Exception{
+    /**
+     * Soma duas {@link List}
+     * @param lista1 lista a ser somada
+     * @param lista2 lista a ser somada
+     * @return soma das duas listas
+     * @throws ListasDiferentesException se as listas tiverem tamanhos divergentes
+     */
+    public static List<Double> somarListas(List<Double> lista1, List<Double> lista2) throws ListasDiferentesException {
         if(lista1.isEmpty()) return lista2;
         if(lista2.isEmpty()) return lista1;
         if(lista1.size() != lista2.size()) throw new ListasDiferentesException();
@@ -311,7 +382,12 @@ public class Utils {
         return soma;
     }
 
-    public static List<AgendaPagamento> getAgendasPadrao() throws Exception{
+    /**
+     * Retorna lista de {@link AgendaPagamento} com dados padrão
+     * @return agendas padrão
+     * @throws DescricaoInvalidaException se alguma descrição padrão estiver incorreta
+     */
+    public static List<AgendaPagamento> getAgendasPadrao() throws DescricaoInvalidaException {
         List<AgendaPagamento> agendas = new ArrayList<>();
         for(String agenda: Settings.AGENDAS_PADRAO){
             agendas.add(new AgendaPagamento(agenda));
