@@ -1,6 +1,7 @@
 package br.ufal.ic.p2.wepayu.services;
 
 import br.ufal.ic.p2.wepayu.exceptions.*;
+import br.ufal.ic.p2.wepayu.models.AgendaPagamento;
 import br.ufal.ic.p2.wepayu.models.Empregado;
 
 import java.text.DecimalFormat;
@@ -281,6 +282,14 @@ public class Utils {
         }
 
         return soma;
+    }
+
+    public static List<AgendaPagamento> getAgendasPadrao() throws Exception{
+        List<AgendaPagamento> agendas = new ArrayList<>();
+        for(String agenda: Settings.AGENDAS_PADRAO){
+            agendas.add(new AgendaPagamento(agenda));
+        }
+        return agendas;
     }
 
 

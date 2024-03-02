@@ -21,6 +21,7 @@ public class EmpregadoComissionado extends Empregado {
         super(nome, endereco, tipo, salario);
         setComissao(comissao);
         this.vendas = new ArrayList<>();
+        setAgendaPagamento(new AgendaPagamento("semanal 2 5"));
     }
 
     public Double getComissao() {

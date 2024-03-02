@@ -16,6 +16,8 @@ public class Empregado implements Serializable, Cloneable {
     private MembroSindicato membroSindicato;
     private MetodoPagamento metodoPagamento;
 
+    private AgendaPagamento agendaPagamento;
+
     public Empregado(){}
     public Empregado(String nome, String endereco, String tipo, Double salario) throws Exception {
         setId(UUID.randomUUID().toString());
@@ -106,6 +108,14 @@ public class Empregado implements Serializable, Cloneable {
         this.salario = salario;
     }
 
+    public AgendaPagamento getAgendaPagamento() {
+        return agendaPagamento;
+    }
+
+    public void setAgendaPagamento(AgendaPagamento agendaPagamento) {
+        this.agendaPagamento = agendaPagamento;
+    }
+
     @Override
     public Empregado clone() {
         try {
@@ -115,6 +125,8 @@ public class Empregado implements Serializable, Cloneable {
                 clone.membroSindicato = this.membroSindicato.clone();
             if(this.metodoPagamento != null)
                 clone.metodoPagamento = this.metodoPagamento.clone();
+            if(this.agendaPagamento != null)
+                clone.agendaPagamento = this.agendaPagamento.clone();
 
             return clone;
         } catch (CloneNotSupportedException e) {

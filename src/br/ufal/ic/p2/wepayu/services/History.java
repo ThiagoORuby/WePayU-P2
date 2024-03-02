@@ -1,7 +1,6 @@
 package br.ufal.ic.p2.wepayu.services;
 
 import br.ufal.ic.p2.wepayu.models.Empregado;
-import br.ufal.ic.p2.wepayu.models.EmpregadoComissionado;
 
 import java.util.LinkedHashMap;
 import java.util.Stack;

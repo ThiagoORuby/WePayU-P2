@@ -11,6 +11,7 @@ public class EmpregadoAssalariado extends Empregado {
     public EmpregadoAssalariado(){}
     public EmpregadoAssalariado(String nome, String endereco, String tipo, Double salario) throws Exception {
         super(nome, endereco, tipo, salario);
+        setAgendaPagamento(new AgendaPagamento("mensal $"));
     }
 
     public Double getDescontos(String dataInicial, String dataFinal) throws Exception{

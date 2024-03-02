@@ -20,6 +20,7 @@ public class EmpregadoHorista extends Empregado {
     public EmpregadoHorista(String nome, String endereco, String tipo, Double salario) throws Exception {
         super(nome, endereco, tipo, salario);
         this.cartoes = new ArrayList<>();
+        setAgendaPagamento(new AgendaPagamento("semanal 5"));
     }
 
     public List<CartaoDePonto> getCartoes(){

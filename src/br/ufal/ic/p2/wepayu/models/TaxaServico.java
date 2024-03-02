@@ -32,7 +32,6 @@ public class TaxaServico implements Serializable, Cloneable {
     @Override
     public TaxaServico clone() {
         try {
-            // TODO: copy mutable state here, so the clone can't change the internals of the original
             return (TaxaServico) super.clone();
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();

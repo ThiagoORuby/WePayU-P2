@@ -1,5 +1,6 @@
 package br.ufal.ic.p2.wepayu.services;
 
+import br.ufal.ic.p2.wepayu.models.AgendaPagamento;
 import br.ufal.ic.p2.wepayu.models.Empregado;
 
 import java.beans.XMLDecoder;
@@ -9,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * Classe de manipulação da base de dados (XML)
@@ -19,10 +21,13 @@ public class DBManager {
     private static DBManager session;
     private boolean isClosed;
     private LinkedHashMap<String, Empregado> empregados;
+    private List<AgendaPagamento> agendas;
 
 
     private DBManager() {
         this.empregados = getAllData();
+        this.isClosed = false;
+        this.agendas = getAllAgendas();
     }
 
     /**
@@ -33,7 +38,6 @@ public class DBManager {
         if(session == null)
         {
             session = new DBManager();
-            session.isClosed = false;
         }
         return session;
     }
@@ -43,12 +47,45 @@ public class DBManager {
      */
     public void clearAll() {
         empregados.clear();
+        restoreAgendas();
         try {
             Files.delete(Path.of(Settings.DB_PATH));
+            Files.delete(Path.of(Settings.AGENDA_PATH));
         }catch (Exception e){
             System.out.println("Arquivo nao existe");
         }
         isClosed = false;
+    }
+
+    private List<AgendaPagamento> getAllAgendas() {
+        List<AgendaPagamento> agendas = new ArrayList<>();
+
+        try(BufferedInputStream file = new BufferedInputStream(
+                new FileInputStream(Settings.AGENDA_PATH))){
+            XMLDecoder decoder = new XMLDecoder(file);
+            while (true){
+                try{
+                    AgendaPagamento ag = (AgendaPagamento) decoder.readObject();
+                    agendas.add(ag);
+                }catch (Exception e){
+                    break;
+                }
+            }
+            decoder.close();
+        }
+        catch (IOException e){
+            System.out.println("Arquivo nao encontrado");
+            restoreAgendas();
+        }
+        return agendas;
+    }
+
+    private void restoreAgendas(){
+        try{
+            agendas = Utils.getAgendasPadrao();
+        }catch (Exception e){
+            System.out.println("Erro ou restaurar a agenda");
+        }
     }
 
     /**
@@ -84,6 +121,10 @@ public class DBManager {
         return empregados;
     }
 
+    public List<AgendaPagamento> queryAgendas(){
+        return agendas;
+    }
+
     /**
      * Salva os dados de empregados no XML
      */
@@ -100,12 +141,29 @@ public class DBManager {
         }
     }
 
+    public void commitAgendas(){
+        try (BufferedOutputStream file = new BufferedOutputStream(
+                new FileOutputStream(Settings.AGENDA_PATH))) {
+            XMLEncoder encoder = new XMLEncoder(file);
+           for(AgendaPagamento agenda: agendas){
+               encoder.writeObject(agenda);
+           }
+            encoder.close();
+        } catch (IOException e) {
+            System.out.println("Arquivo nao encontrado");
+        }
+    }
+
     /**
      * Adiciona um novo empregado
      * @param empregado {@link Empregado} a ser adicionado
      */
     public void add(Empregado empregado) {
         empregados.put(empregado.getId(), empregado);
+    }
+
+    public void addAgenda(AgendaPagamento agenda){
+        agendas.add(agenda);
     }
 
     /**
