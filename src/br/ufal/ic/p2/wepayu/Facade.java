@@ -1,6 +1,7 @@
 package br.ufal.ic.p2.wepayu;
 
 import br.ufal.ic.p2.wepayu.daos.*;
+import br.ufal.ic.p2.wepayu.exceptions.AgendaIndisponivelException;
 import br.ufal.ic.p2.wepayu.exceptions.TipoEmpregadoInvalidoException;
 import br.ufal.ic.p2.wepayu.services.*;
 import br.ufal.ic.p2.wepayu.models.*;
@@ -57,7 +58,7 @@ public class Facade {
     {
         if(atributo.equals("agendaPagamento")){
             if(!daos.getAgendaDao().find(valor))
-                throw new Exception("Agenda de pagamento nao esta disponivel");
+                throw new AgendaIndisponivelException();
         }
 
         if(atributo.equals("metodoPagamento")) {

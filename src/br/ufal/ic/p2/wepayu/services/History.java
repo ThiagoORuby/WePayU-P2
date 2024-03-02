@@ -1,5 +1,7 @@
 package br.ufal.ic.p2.wepayu.services;
 
+import br.ufal.ic.p2.wepayu.exceptions.RedoException;
+import br.ufal.ic.p2.wepayu.exceptions.UndoException;
 import br.ufal.ic.p2.wepayu.models.Empregado;
 
 import java.util.LinkedHashMap;
@@ -25,7 +27,7 @@ public class History {
 
     public Memento getUndo() throws Exception{
         if(undoStack.size() <= 1){
-            throw new Exception("Nao ha comando a desfazer.");
+            throw new UndoException();
         }
         else {
             redoStack.push(undoStack.pop());
@@ -39,7 +41,7 @@ public class History {
             return undoStack.peek();
         }
         else{
-            throw new Exception("Nao ha comando a refazer.");
+            throw new RedoException();
         }
     }
 

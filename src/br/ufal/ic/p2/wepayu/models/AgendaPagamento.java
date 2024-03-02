@@ -1,5 +1,6 @@
 package br.ufal.ic.p2.wepayu.models;
 
+import br.ufal.ic.p2.wepayu.exceptions.DescricaoInvalidaException;
 import br.ufal.ic.p2.wepayu.services.Settings;
 
 import java.io.Serializable;
@@ -17,18 +18,17 @@ public class AgendaPagamento implements Serializable, Cloneable {
     public AgendaPagamento(String descricao) throws Exception{
         setDescricao(descricao);
         String[] splitted = descricao.split("\\s+");
-        // TODO; Melhorar codigo (conversao pra inteiro, checagem de erro)
         if(splitted.length >= 1){
             String tipo = splitted[0];
             if(!Arrays.asList(Settings.TIPOS_AGENDAS).contains(tipo))
-                throw new Exception("Descricao de agenda invalida");
+                throw new DescricaoInvalidaException();
             setTipo(tipo);
         }
 
         if(splitted.length >= 3){
             int semana = Integer.parseInt(splitted[1]);
             if(semana > 52 || semana < 1)
-                throw new Exception("Descricao de agenda invalida");
+                throw new DescricaoInvalidaException();
             setSemana(semana);
         }
 
@@ -39,7 +39,7 @@ public class AgendaPagamento implements Serializable, Cloneable {
             else {
                 int dia = Integer.parseInt(splitted[splitted.length - 1]);
                 if(dia > 7 || dia < 1)
-                    throw new Exception("Descricao de agenda invalida");
+                    throw new DescricaoInvalidaException();
                 setDia(dia);
             }
         }

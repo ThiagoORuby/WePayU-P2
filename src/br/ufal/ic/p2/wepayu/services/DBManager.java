@@ -1,5 +1,6 @@
 package br.ufal.ic.p2.wepayu.services;
 
+import br.ufal.ic.p2.wepayu.exceptions.SistemaEncerradoException;
 import br.ufal.ic.p2.wepayu.models.AgendaPagamento;
 import br.ufal.ic.p2.wepayu.models.Empregado;
 
@@ -183,7 +184,7 @@ public class DBManager {
     public void restore(Memento snapshot) throws Exception {
 
         if (isClosed) {
-            throw new Exception("Nao pode dar comandos depois de encerrarSistema.");
+            throw new SistemaEncerradoException();
         }
         if (snapshot.getEmpregadosSnapshot() != null){
             this.empregados = new LinkedHashMap<>();
