@@ -16,10 +16,23 @@ public class EmpregadoDao{
 
     private final DBManager session;
 
+    /**
+     * Cria uma instância de {@link EmpregadoDao} com base em uma sessão
+     * @param session {@link DBManager} da sessão do banco de dados
+     */
     public EmpregadoDao(DBManager session) {
         this.session = session;
     }
 
+    /**
+     * Cria um novo {@link EmpregadoHorista} ou {@link EmpregadoAssalariado}
+     * @param nome nome do empregado
+     * @param endereco endereço do empregado
+     * @param tipo tipo ('horista' ou 'assalariado')
+     * @param salario valor do salário
+     * @return {@link Empregado} criado
+     * @throws Exception se falhar em alguma verificação
+     */
     public Empregado create(String nome, String endereco, String tipo, String salario) throws Exception {
         Empregado empregado = null;
         switch (tipo) {
@@ -43,6 +56,16 @@ public class EmpregadoDao{
         return empregado;
     }
 
+    /**
+     * Cria um novo {@link EmpregadoComissionado}
+     * @param nome nome do empregado
+     * @param endereco endereço do empregado
+     * @param tipo tipo ('comissionado')
+     * @param salario valor do salário
+     * @param comissao valor da comissão
+     * @return {@link Empregado} criado
+     * @throws Exception se falhar em alguma verificação
+     */
     public Empregado create(String nome, String endereco, String tipo, String salario, String comissao) throws Exception{
         EmpregadoComissionado empregado = null;
         if (tipo.equals("comissionado"))
@@ -60,6 +83,12 @@ public class EmpregadoDao{
         return empregado;
     }
 
+    /**
+     * Retorna um empregado com base no id
+     * @param id id do empregado
+     * @return {@link Empregado} correspondente
+     * @throws Exception se falhar em alguma verificação
+     */
     public Empregado getById(String id) throws Exception {
 
         if(id.isEmpty())
@@ -73,7 +102,13 @@ public class EmpregadoDao{
         return empregado;
     }
 
-    public List<String> getByName(String nome) throws Exception{
+    /**
+     * Retorna um empregado com base no nome
+     * @param nome nome do empregado
+     * @return {@link Empregado} correspondente
+     * @throws EmpregadoNaoExisteException se o empregado não existir
+     */
+    public List<String> getByName(String nome) throws EmpregadoNaoExisteException {
         List<String> empregados = new ArrayList<>();
 
         for(Map.Entry<String, Empregado> emp: session.query().entrySet()) {
@@ -88,7 +123,13 @@ public class EmpregadoDao{
         return empregados;
     }
 
-    public Empregado getByIdSindicato(String idSindicato) throws Exception{
+    /**
+     * Retorna um empregado com base no id do sindicato
+     * @param idSindicato id do sindicato
+     * @return {@link Empregado} relacionado
+     * @throws Exception se falhar em alguma verificação
+     */
+    public Empregado getByIdSindicato(String idSindicato) throws Exception {
 
         if(idSindicato.isEmpty()) throw new ValorNuloException("Identificacao do membro", "a");
 
@@ -103,7 +144,14 @@ public class EmpregadoDao{
         throw new MembroNaoExisteException();
     }
 
-    public String getAtributo(String emp, String atributo) throws Exception{
+    /**
+     * Retorna o valor de um atributo do empregado
+     * @param emp id do empregado
+     * @param atributo atributo buscado
+     * @return valor do atributo buscado
+     * @throws Exception se falhar em alguma verificação
+     */
+    public String getAtributo(String emp, String atributo) throws Exception {
         Empregado empregado = getById(emp);
 
         Utils.checarAtributo(empregado, atributo);
@@ -128,6 +176,14 @@ public class EmpregadoDao{
         };
     }
 
+    /**
+     * Atualiza o valor de um atributo pelo id do empregado
+     * @param id id do empregado
+     * @param atributo nome do atributo
+     * @param valor novo valor do atributo
+     * @param valor1 comissao caso haja atualização de tipo
+     * @throws Exception se falhar em alguma verificação
+     */
     public void updateAtributoById(String id, String atributo, String valor, String valor1) throws Exception
     {
         Empregado empregado = getById(id);
@@ -151,7 +207,14 @@ public class EmpregadoDao{
         session.commit();
     }
 
-    public void updateTipo(Empregado e, String tipo, String valor) throws Exception{
+    /**
+     * Atualiza tipo do empregado
+     * @param e {@link Empregado} a ser atualizado
+     * @param tipo novo tipo
+     * @param valor valor da comissão ou novo salario
+     * @throws Exception se falhar em alguma verificação
+     */
+    public void updateTipo(Empregado e, String tipo, String valor) throws Exception {
         String id = e.getId();
         Empregado novoEmp;
         switch (tipo)
@@ -169,24 +232,54 @@ public class EmpregadoDao{
         session.update(id, novoEmp);
     }
 
-    public Empregado convertToAssalariado(Empregado e, String valor) throws Exception{
+    /**
+     * Converte um empregado em assalariado
+     * @param e {@link Empregado} a ser convertido
+     * @param valor valor do novo salário
+     * @return {@link EmpregadoAssalariado} criado
+     * @throws Exception se falhar em alguma verificação
+     */
+    public Empregado convertToAssalariado(Empregado e, String valor) throws Exception {
 
         String salario = Utils.doubleToString(e.getSalario(), false);
         return create(e.getNome(), e.getEndereco(), "assalariado", valor != null ? valor : salario);
     }
 
+    /**
+     * Converte um empregado em horista
+     * @param e {@link Empregado} a ser convertido
+     * @param valor valor do novo salário
+     * @return {@link EmpregadoHorista} criado
+     * @throws Exception se falhar em alguma verificação
+     */
     public Empregado convertToHorista(Empregado e, String valor) throws Exception{
         String salario = Utils.doubleToString(e.getSalario(), false);
         return create(e.getNome(), e.getEndereco(), "horista", valor != null ? valor : salario);
     }
 
+    /**
+     * Converte um empregado em comissionado
+     * @param e {@link Empregado} a ser convertido
+     * @param valor valor da nova comissao ou salário
+     * @return {@link EmpregadoComissionado} criado
+     * @throws Exception se falhar em alguma verificação
+     */
     public Empregado convertToComissionado(Empregado e, String valor) throws Exception{
         String salario = Utils.doubleToString(e.getSalario(), false);
         return create(e.getNome(), e.getEndereco(), "comissionado", salario, valor);
     }
 
-    public void updatePagamentoEmpregado(String emp, String tipo, String banco, String agencia, String contaCorrente) throws Exception{
-        Empregado empregado = getById(emp);
+    /**
+     * Atualiza método de pagamento do empregado
+     * @param id id do empregado
+     * @param tipo tipo do método de pagamento
+     * @param banco nome do banco, se for pagamento em banco
+     * @param agencia número da agência, se for pagamento em banco
+     * @param contaCorrente número da conta, se for pagamento em banco
+     * @throws Exception se falhar em alguma verificação
+     */
+    public void updatePagamentoEmpregado(String id, String tipo, String banco, String agencia, String contaCorrente) throws Exception {
+        Empregado empregado = getById(id);
 
 
         tipo = Utils.validarAtributo(tipo, Settings.METODOS_PAGAMENTO, "Metodo de pagamento", false);
@@ -203,8 +296,13 @@ public class EmpregadoDao{
         session.commit();
     }
 
-
-    public void deleteById(String id) throws Exception {
+    /**
+     * Remove um empregado com base em seu id
+     * @param id id do empregado
+     * @throws ValorNuloException se o id for nulo
+     * @throws EmpregadoNaoExisteException se o empregado não existir
+     */
+    public void deleteById(String id) throws ValorNuloException, EmpregadoNaoExisteException {
 
         if(id.isEmpty())
             throw new ValorNuloException("Identificacao do empregado", "a");
@@ -215,7 +313,12 @@ public class EmpregadoDao{
             throw new EmpregadoNaoExisteException();
     }
 
-    public void checkSindicadoId(String idSindicato) throws Exception
+    /**
+     * Verifica se um id de sindicato já existe entre os empregados
+     * @param idSindicato id do sindicato a ser verificado
+     * @throws EmpregadoJaExisteException se já existir empregado com este id
+     */
+    public void checkSindicadoId(String idSindicato) throws EmpregadoJaExisteException
     {
         for(Map.Entry<String, Empregado> emp: session.query().entrySet()) {
             Empregado empregado = emp.getValue();

@@ -59,7 +59,7 @@ public class Utils {
      * Converter um valor Double para um String
      * @param valor valor a ser convertido
      * @param dynamic booleano que indica a dinamicidade da parte decimal
-     * @return
+     * @return valor convertido
      */
     public static String doubleToString(Double valor, boolean dynamic){;
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(new Locale("pt", "BR"));
@@ -210,9 +210,10 @@ public class Utils {
     /**
      * Verifica se um tipo é valido ou aplicável
      * @param tipo tipo a ser verificado
-     * @throws Exception se falhar na verificação
+     * @throws TipoInvalidoException se não existir o tipo
+     * @throws TipoNaoAplicavelException c.c.
      */
-    public static void checarTipo(String tipo) throws Exception {
+    public static void checarTipo(String tipo) throws TipoInvalidoException, TipoNaoAplicavelException {
         if(!Settings.TIPOS.contains(tipo)){
             throw  new TipoInvalidoException();
         }
