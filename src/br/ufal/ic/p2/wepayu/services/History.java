@@ -33,7 +33,7 @@ public class History {
     public void push(){
         Memento m = new Memento(currentEmpregados);
         undoStack.push(m);
-
+        redoStack.clear();
     }
 
     /**
