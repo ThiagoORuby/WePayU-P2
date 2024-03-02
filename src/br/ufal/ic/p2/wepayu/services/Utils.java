@@ -281,19 +281,19 @@ public class Utils {
             if(dia == -1){
                 return ehUltimoDiaMes(data);
             }
-            else if(diaDaSemana == DayOfWeek.of(dia)) return true;
+            else if(dataParse.getDayOfMonth() == dia) return true;
         }
         else{
             int dia = agenda.getDia();
             if(agenda.getSemana() > 0){
                 // a cada x semanas
 
+                if(dataParse.getDayOfWeek() != DayOfWeek.of(dia)) return false;
+
                 // Calcula a data da contratação (1/1/2005)
                 LocalDate dataContratacao = LocalDate.of(2005, 1, 1);
-
-                long diferencaEmDias = ChronoUnit.DAYS.between(dataContratacao, dataParse) + 1;
-
-                return diferencaEmDias % agenda.getSemana()*7 == 0;
+                long totalSemanas = ChronoUnit.WEEKS.between(dataContratacao, dataParse) + 1;
+                return totalSemanas % agenda.getSemana() == 0;
             }
             else{
                 // toda semana
