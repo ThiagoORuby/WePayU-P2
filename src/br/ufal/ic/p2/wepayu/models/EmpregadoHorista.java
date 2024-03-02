@@ -136,16 +136,19 @@ public class EmpregadoHorista extends Empregado {
         valores.add(getHorasExtrasTrabalhadas(dataInicial, data));
         valores.add(getSalarioBruto(dataInicial, data));
 
-        // Confere se há salario suficiente para retirar os descontos
+        // Confere se há salario suficiente para retirar os descontos acumulados
         Double desconto = getDescontos(dataInicial,data);
-        if(valores.get(2) < desconto) {
+        Double descontoTotal = desconto +
+                ((getSindicalizado()) ? getMembroSindicato().getTotalTaxasExtras() : 0D);
+
+        if(valores.get(2) < descontoTotal) {
             valores.add(0D);
             String dataCobranca = Utils.getProximoDiaDePagamento(data, getAgendaPagamento());
             setTaxaExtra(dataCobranca, desconto);
         }
         else {
-            desconto += (getSindicalizado()) ? getMembroSindicato().getAndClearTaxasExtras() : 0D;
-            valores.add(desconto);
+            if(getSindicalizado()) getMembroSindicato().clearTaxasExtras();
+            valores.add(descontoTotal);
         }
 
         // Adiciona dado de salário liquido

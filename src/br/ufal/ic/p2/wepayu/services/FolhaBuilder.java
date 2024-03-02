@@ -37,27 +37,27 @@ public class FolhaBuilder {
         Double total = 0d;
         for(Map.Entry<String, Empregado> emp: session.query().entrySet()){
             Empregado e = emp.getValue();
+            AgendaPagamento agenda = e.getAgendaPagamento();
             switch (e.getTipo())
             {
                 case "horista" -> {
                     // Checa se é sexta e pega a ultima sexta para calcular o salario dos horistas
-                    if(Utils.ehDiaDePagamento(data, e.getAgendaPagamento())){
-                        String dataInicial = Utils.getUltimoDiaDePagamento(data, e.getAgendaPagamento());
+                    if(Utils.ehDiaDePagamento(data, agenda)){
+                        String dataInicial = Utils.getUltimoDiaDePagamento(data, agenda);
                         total += ((EmpregadoHorista) e).getSalarioBruto(dataInicial, data);
                     }
                 }
                 case "assalariado" -> {
                     // Checa se é o ultimo dia do mes para calcular o salario dos assalariados
-                    if(Utils.ehDiaDePagamento(data, e.getAgendaPagamento())){
-                        // todo: atualizar com base na agenda de pagamento
+                    if(Utils.ehDiaDePagamento(data, agenda)){
                         total += ((EmpregadoAssalariado)e).getSalarioBruto();
                     }
                 }
                 case "comissionado" -> {
                     // Checha se está no escopo de a cada 2 sextas, pega o ultimo dia de pagamento e
                     // calcula o salario dos comissionados
-                    if(Utils.ehDiaDePagamento(data, e.getAgendaPagamento())){
-                        String dataInicial = Utils.getUltimoDiaDePagamento(data, e.getAgendaPagamento());
+                    if(Utils.ehDiaDePagamento(data, agenda)){
+                        String dataInicial = Utils.getUltimoDiaDePagamento(data, agenda);
                         total += ((EmpregadoComissionado) e).getSalarioBruto(dataInicial, data);
                     }
                 }

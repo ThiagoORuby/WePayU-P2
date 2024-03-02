@@ -94,13 +94,16 @@ public class MembroSindicato implements Serializable, Cloneable {
         return valorTotal;
     }
 
-    public Double getAndClearTaxasExtras() {
+    public Double getTotalTaxasExtras() {
         Double valorTotal = 0d;
         for(TaxaServico taxa: taxasExtras){
                 valorTotal += taxa.getValor();
         }
-        taxasExtras.clear();
         return valorTotal;
+    }
+
+    public void clearTaxasExtras(){
+        taxasExtras.clear();
     }
 
     @Override
