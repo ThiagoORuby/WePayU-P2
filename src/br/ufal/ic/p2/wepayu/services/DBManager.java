@@ -55,7 +55,7 @@ public class DBManager {
             Files.delete(Path.of(Settings.DB_PATH));
             Files.delete(Path.of(Settings.AGENDA_PATH));
         }catch (Exception e){
-            System.out.println("Arquivo nao existe");
+            System.out.println("Arquivo nao existe para ser deletado");
         }
         isClosed = false;
     }
