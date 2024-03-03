@@ -81,7 +81,7 @@ public class DBManager {
             decoder.close();
         }
         catch (IOException e){
-            System.out.println("Arquivo nao encontrado");
+            System.out.println("Arquivo nao encontrado, será criado em seguida");
             restoreAgendas();
         }
         return agendas;
@@ -119,7 +119,7 @@ public class DBManager {
             }
             decoder.close();
         }catch (IOException e) {
-            System.out.println("Arquivo nao encontrado");
+            System.out.println("Arquivo nao encontrado, será criado em seguida");
         }
         return empregados;
     }
