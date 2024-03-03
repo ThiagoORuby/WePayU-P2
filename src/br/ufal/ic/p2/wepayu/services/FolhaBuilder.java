@@ -31,7 +31,7 @@ public class FolhaBuilder {
      * Retorna o total da folha de pagamento relativa a data
      * @param data Data da folha de pagamento
      * @return {@link Double} total da folha de pagamento
-     * @throws Exception
+     * @throws Exception se falhar em alguma verificação
      */
     public Double getTotalFolha(String data) throws Exception{
         Double total = 0d;
@@ -267,7 +267,7 @@ public class FolhaBuilder {
      * Gera o txt com folha de pagamento de um determinado dia
      * @param data Data da folha de pagamento
      * @param saida Nome do arquivo txt
-     * @throws Exception
+     * @throws Exception se falhar em alguma verificação
      */
     public void geraFolha(String data, String saida) throws Exception{
 

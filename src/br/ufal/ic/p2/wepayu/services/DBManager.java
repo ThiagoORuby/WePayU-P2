@@ -199,7 +199,7 @@ public class DBManager {
 
     /**
      * Retorna o tamanho da base de dados de empregados
-     * @return tamanho de empregados
+     * @return total de empregados
      */
     public String size(){
         return String.valueOf(this.empregados.size());

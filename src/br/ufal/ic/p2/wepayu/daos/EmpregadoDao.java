@@ -146,13 +146,13 @@ public class EmpregadoDao{
 
     /**
      * Retorna o valor de um atributo do empregado
-     * @param emp id do empregado
+     * @param id id do empregado
      * @param atributo atributo buscado
      * @return valor do atributo buscado
      * @throws Exception se falhar em alguma verificação
      */
-    public String getAtributo(String emp, String atributo) throws Exception {
-        Empregado empregado = getById(emp);
+    public String getAtributo(String id, String atributo) throws Exception {
+        Empregado empregado = getById(id);
 
         Utils.checarAtributo(empregado, atributo);
 
