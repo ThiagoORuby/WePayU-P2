@@ -166,7 +166,7 @@ public class Facade {
      */
     public void alteraEmpregado(String emp, String atributo, String valor, String idSindicato, String taxaSindical) throws Exception{
         // verifica se as condições são favoráveis
-        if(!atributo.equals("sindicalizado") || !Boolean.getBoolean(valor)) return;
+        if(!atributo.equals("sindicalizado")) return;
 
         // realiza as formatações necessárias
         idSindicato = Utils.validarAtributo(idSindicato, "Identificacao do sindicato", "a");
